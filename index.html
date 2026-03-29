@@ -2,64 +2,60 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Korepetycje - Znajdź Pomoc</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Korepetycje Plus</title>
     <style>
         :root {
             --primary: #008080;
             --bg: #f4f7f6;
             --white: #ffffff;
             --text: #333;
+            --sec: #999;
             --shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, system-ui, sans-serif;
             margin: 0;
             background-color: var(--bg);
             color: var(--text);
-            padding-bottom: 60px;
+            padding-bottom: 80px;
         }
 
         header {
             background-color: var(--primary);
             color: white;
-            padding: 20px;
+            padding: 15px;
             text-align: center;
-            box-shadow: var(--shadow);
+            font-weight: bold;
         }
 
+        /* Menu górne */
         .tabs {
             display: flex;
-            justify-content: center;
             background: var(--white);
-            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
             position: sticky;
             top: 0;
             z-index: 10;
         }
-
         .tab {
             flex: 1;
             text-align: center;
             padding: 15px;
             cursor: pointer;
-            font-weight: bold;
-            transition: 0.3s;
-            border-bottom: 3px solid transparent;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--sec);
         }
-
         .tab.active {
             color: var(--primary);
             border-bottom: 3px solid var(--primary);
         }
 
-        .container {
-            padding: 15px;
-            max-width: 600px;
-            margin: 0 auto;
-        }
+        .container { padding: 15px; max-width: 600px; margin: 0 auto; }
 
+        /* Karty ogłoszeń */
         .ad-card {
             background: var(--white);
             border-radius: 12px;
@@ -67,33 +63,19 @@
             margin-bottom: 15px;
             box-shadow: var(--shadow);
         }
+        .ad-card h3 { margin: 0 0 8px 0; color: var(--primary); }
+        .price { font-weight: bold; color: #2ecc71; }
 
-        .ad-card h3 { margin: 0 0 10px 0; color: var(--primary); }
-        .ad-card p { margin: 5px 0; font-size: 14px; }
-        .ad-card .price { font-weight: bold; color: #2ecc71; font-size: 16px; }
-        .ad-card .contact { 
-            margin-top: 10px; 
-            padding-top: 10px; 
-            border-top: 1px solid #eee; 
-            font-style: italic; 
-            color: #666;
-        }
+        /* Formularze */
+        .page { display: none; }
+        .page.active { display: block; }
 
-        /* Formularz dodawania */
-        .add-form {
-            background: var(--white);
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            display: none; /* Ukryty domyślnie */
-        }
-
-        input, textarea, select {
+        input, textarea {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             margin: 8px 0;
             border: 1px solid #ddd;
-            border-radius: 6px;
+            border-radius: 8px;
             box-sizing: border-box;
         }
 
@@ -101,116 +83,205 @@
             background: var(--primary);
             color: white;
             border: none;
-            padding: 12px;
+            padding: 14px;
             width: 100%;
-            border-radius: 6px;
+            border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
+            margin-top: 10px;
         }
 
-        .fab {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: var(--primary);
-            color: white;
-            width: 60px;
-            height: 60px;
+        /* Profil */
+        .profile-header { text-align: center; padding: 20px; }
+        .profile-img {
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
+            background: #ddd;
+            margin: 0 auto 10px;
+            background-size: cover;
+            background-position: center;
+            border: 3px solid var(--primary);
+        }
+
+        /* Navbar dół */
+        .navbar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: white;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 30px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            border-top: 1px solid #ddd;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 10px 0;
+            font-size: 11px;
+            color: var(--sec);
             cursor: pointer;
         }
+        .nav-item.active { color: var(--primary); }
+        .nav-icon { font-size: 20px; display: block; }
     </style>
 </head>
 <body>
 
-<header>
-    <h1>Korepetycje Plus</h1>
-</header>
+<header id="mainHeader">Korepetycje Plus</header>
 
-<div class="tabs">
-    <div class="tab active" onclick="switchTab('tutor')">Korepetytorzy</div>
-    <div class="tab" onclick="switchTab('student')">Uczniowie</div>
-</div>
-
-<div class="container">
-    <div id="formSection" class="add-form">
-        <h2 id="formTitle">Dodaj ogłoszenie</h2>
-        <input type="text" id="subject" placeholder="Przedmiot (np. Matematyka)">
-        <input type="text" id="name" placeholder="Twoje Imię">
-        <input type="number" id="age" placeholder="Wiek">
-        <input type="text" id="price" placeholder="Cena za godzinę (np. 50 zł)">
-        <textarea id="desc" placeholder="Opis (czego uczysz / czego szukasz)"></textarea>
-        <input type="text" id="contact" placeholder="Kontakt (Tel lub E-mail)">
-        <button class="btn" onclick="saveAd()">Opublikuj ogłoszenie</button>
-        <button class="btn" style="background:#666; margin-top:5px;" onclick="toggleForm()">Anuluj</button>
+<div id="homePage" class="page active">
+    <div class="tabs">
+        <div class="tab active" id="tabTutor" onclick="setCategory('tutor')">Korepetytorzy</div>
+        <div class="tab" id="tabStudent" onclick="setCategory('student')">Uczniowie</div>
     </div>
-
-    <div id="adsList"></div>
+    <div class="container" id="adsList"></div>
 </div>
 
-<div class="fab" onclick="toggleForm()">+</div>
+<div id="addPage" class="page">
+    <div class="container">
+        <h2>Dodaj ogłoszenie</h2>
+        <input type="text" id="subject" placeholder="Przedmiot">
+        <input type="text" id="adPrice" placeholder="Cena (np. 50 zł/h)">
+        <textarea id="desc" placeholder="Opis..."></textarea>
+        <button class="btn" onclick="saveAd()">Opublikuj</button>
+    </div>
+</div>
+
+<div id="accountPage" class="page">
+    <div class="container">
+        <div id="authSection">
+            <h2>Utwórz konto / Zaloguj</h2>
+            <input type="email" id="email" placeholder="E-mail">
+            <input type="password" id="pass" placeholder="Hasło">
+            <button class="btn" onclick="handleAuth()">Zaloguj / Zarejestruj</button>
+        </div>
+
+        <div id="profileSection" style="display:none;">
+            <div class="profile-header">
+                <div class="profile-img" id="userImgDisplay"></div>
+                <h3 id="userNameDisplay">Użytkownik</h3>
+                <p id="userEmailDisplay" style="color:#666;"></p>
+            </div>
+            <input type="text" id="newUsername" placeholder="Zmień nazwę użytkownika">
+            <label style="font-size:12px; color:#666;">Wybierz zdjęcie profilowe:</label>
+            <input type="file" id="imgInput" accept="image/*" onchange="updatePhoto()">
+            <button class="btn" onclick="updateProfile()">Aktualizuj profil</button>
+            <button class="btn" style="background:#ff5c5c;" onclick="logout()">Wyloguj</button>
+        </div>
+    </div>
+</div>
+
+<nav class="navbar">
+    <div class="nav-item active" onclick="showPage('homePage', this)">
+        <span class="nav-icon">🏠</span>Ogłoszenia
+    </div>
+    <div class="nav-item" onclick="showPage('addPage', this)">
+        <span class="nav-icon">➕</span>Dodaj
+    </div>
+    <div class="nav-item" onclick="showPage('accountPage', this)">
+        <span class="nav-icon">👤</span>Moje konto
+    </div>
+</nav>
 
 <script>
-    let currentTab = 'tutor';
-    let ads = JSON.parse(localStorage.getItem('korepetycje_ads')) || [
-        { type: 'tutor', subject: 'Matematyka', name: 'Ania', age: 22, price: '60 zł', desc: 'Pomogę w przygotowaniu do matury podstawowej.', contact: 'ania@mail.com' },
-        { type: 'student', subject: 'Fizyka', name: 'Marek', age: 16, price: 'do 50 zł', desc: 'Szukam kogoś kto wytłumaczy mi dynamikę.', contact: '555-666-777' }
-    ];
+    let currentCategory = 'tutor';
+    let user = JSON.parse(localStorage.getItem('kp_user')) || null;
+    let ads = JSON.parse(localStorage.getItem('kp_ads')) || [];
 
-    function switchTab(tab) {
-        currentTab = tab;
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        event.target.classList.add('active');
+    function showPage(pageId, el) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        el.classList.add('active');
+        if(pageId === 'accountPage') checkAuth();
+        if(pageId === 'homePage') renderAds();
+    }
+
+    function setCategory(cat) {
+        currentCategory = cat;
+        document.getElementById('tabTutor').classList.toggle('active', cat === 'tutor');
+        document.getElementById('tabStudent').classList.toggle('active', cat === 'student');
         renderAds();
     }
 
-    function toggleForm() {
-        const form = document.getElementById('formSection');
-        form.style.display = (form.style.display === 'block') ? 'none' : 'block';
-        document.getElementById('formTitle').innerText = currentTab === 'tutor' ? 'Dodaj jako Korepetytor' : 'Dodaj jako Uczeń';
+    // AUTH LOGIC
+    function handleAuth() {
+        const email = document.getElementById('email').value;
+        if(!email) return alert("Podaj e-mail!");
+        user = { email: email, name: email.split('@')[0], photo: '' };
+        localStorage.setItem('kp_user', JSON.stringify(user));
+        checkAuth();
     }
 
+    function checkAuth() {
+        if(user) {
+            document.getElementById('authSection').style.display = 'none';
+            document.getElementById('profileSection').style.display = 'block';
+            document.getElementById('userNameDisplay').innerText = user.name;
+            document.getElementById('userEmailDisplay').innerText = user.email;
+            if(user.photo) document.getElementById('userImgDisplay').style.backgroundImage = `url(${user.photo})`;
+        } else {
+            document.getElementById('authSection').style.display = 'block';
+            document.getElementById('profileSection').style.display = 'none';
+        }
+    }
+
+    function updatePhoto() {
+        const file = document.getElementById('imgInput').files[0];
+        const reader = new FileReader();
+        reader.onloadend = function() {
+            user.photo = reader.result;
+            document.getElementById('userImgDisplay').style.backgroundImage = `url(${reader.result})`;
+        }
+        if(file) reader.readAsDataURL(file);
+    }
+
+    function updateProfile() {
+        const newName = document.getElementById('newUsername').value;
+        if(newName) user.name = newName;
+        localStorage.setItem('kp_user', JSON.stringify(user));
+        alert("Profil zaktualizowany!");
+        checkAuth();
+    }
+
+    function logout() {
+        user = null;
+        localStorage.removeItem('kp_user');
+        checkAuth();
+    }
+
+    // ADS LOGIC
     function saveAd() {
+        if(!user) return alert("Musisz być zalogowany, aby dodać ogłoszenie!");
         const ad = {
-            type: currentTab,
+            category: currentCategory,
             subject: document.getElementById('subject').value,
-            name: document.getElementById('name').value,
-            age: document.getElementById('age').value,
-            price: document.getElementById('price').value,
+            price: document.getElementById('adPrice').value,
             desc: document.getElementById('desc').value,
-            contact: document.getElementById('contact').value
+            author: user.name,
+            authorImg: user.photo
         };
-
-        if(!ad.subject || !ad.contact) return alert("Wypełnij przedmiot i kontakt!");
-
         ads.push(ad);
-        localStorage.setItem('korepetycje_ads', JSON.stringify(ads));
-        toggleForm();
-        renderAds();
-        
-        // Czyścimy pola
-        document.querySelectorAll('input, textarea').forEach(i => i.value = '');
+        localStorage.setItem('kp_ads', JSON.stringify(ads));
+        alert("Dodano ogłoszenie!");
+        showPage('homePage', document.querySelectorAll('.nav-item')[0]);
     }
 
     function renderAds() {
         const list = document.getElementById('adsList');
         list.innerHTML = '';
-
-        const filtered = ads.filter(ad => ad.type === currentTab);
-
+        const filtered = ads.filter(a => a.category === currentCategory);
         filtered.slice().reverse().forEach(ad => {
             list.innerHTML += `
                 <div class="ad-card">
+                    <div style="display:flex; align-items:center; margin-bottom:10px;">
+                        <div style="width:30px; height:30px; border-radius:50%; background:#eee; margin-right:10px; background-image:url(${ad.authorImg || ''}); background-size:cover;"></div>
+                        <small>${ad.author}</small>
+                    </div>
                     <h3>${ad.subject}</h3>
-                    <p><strong>Imię:</strong> ${ad.name} (${ad.age} lat)</p>
                     <p>${ad.desc}</p>
-                    <p class="price">Cena: ${ad.price}</p>
-                    <div class="contact">Kontakt: ${ad.contact}</div>
+                    <div class="price">${ad.price}</div>
                 </div>
             `;
         });
