@@ -3,261 +3,306 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Korepetycje Plus</title>
+    <title>Korepetycje PRO</title>
     <style>
         :root {
-            --primary: #008080;
-            --bg: #f4f7f6;
-            --white: #ffffff;
-            --text: #333;
-            --sec: #999;
-            --err: #ff5c5c;
-            --shadow: 0 4px 6px rgba(0,0,0,0.1);
+            --bg: #0a0b10;
+            --card: #161b22;
+            --primary: #0070f3;
+            --primary-glow: rgba(0, 112, 243, 0.3);
+            --text: #f0f6fc;
+            --sec: #8b949e;
+            --border: #30363d;
         }
 
         body {
-            font-family: -apple-system, system-ui, sans-serif;
-            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg);
             color: var(--text);
-            padding-bottom: 80px;
+            margin: 0;
+            padding-bottom: 90px;
+            overflow-x: hidden;
         }
 
-        header { background-color: var(--primary); color: white; padding: 15px; text-align: center; font-weight: bold; }
+        /* Header */
+        header {
+            padding: 20px;
+            text-align: center;
+            background: rgba(10, 11, 16, 0.8);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border);
+        }
+        header h1 { margin: 0; font-size: 20px; letter-spacing: 1px; color: var(--primary); }
 
-        /* Menu górne */
-        .tabs { display: flex; background: var(--white); border-bottom: 1px solid #ddd; position: sticky; top: 0; z-index: 10; }
-        .tab { flex: 1; text-align: center; padding: 15px; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--sec); }
-        .tab.active { color: var(--primary); border-bottom: 3px solid var(--primary); }
+        /* Tabs */
+        .tabs { display: flex; padding: 10px; gap: 10px; background: var(--bg); }
+        .tab {
+            flex: 1; padding: 12px; text-align: center; border-radius: 10px;
+            background: var(--card); color: var(--sec); cursor: pointer;
+            transition: 0.3s; font-weight: 600; font-size: 14px;
+        }
+        .tab.active { background: var(--primary); color: white; box-shadow: 0 0 15px var(--primary-glow); }
 
-        .container { padding: 15px; max-width: 600px; margin: 0 auto; }
+        .container { padding: 15px; max-width: 500px; margin: 0 auto; }
 
-        /* Karty ogłoszeń */
-        .ad-card { background: var(--white); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: var(--shadow); position: relative; }
-        .ad-card h3 { margin: 0 0 8px 0; color: var(--primary); }
-        .price { font-weight: bold; color: #2ecc71; margin-top: 5px; }
-        .msg-btn { background: #eee; border: none; padding: 8px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; margin-top: 10px; width: 100%; font-weight: bold; }
+        /* Ad Cards */
+        .ad-card {
+            background: var(--card); border-radius: 16px; padding: 20px;
+            margin-bottom: 15px; border: 1px solid var(--border);
+            animation: fadeIn 0.5s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Wiadomości */
-        .msg-item { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid var(--primary); box-shadow: var(--shadow); }
-        .msg-item b { display: block; color: var(--primary); margin-bottom: 5px; }
+        .ad-card h3 { margin: 0 0 10px 0; font-size: 18px; }
+        .ad-card p { color: var(--sec); font-size: 14px; line-height: 1.5; }
+        .price-tag { 
+            display: inline-block; padding: 5px 12px; background: rgba(0, 112, 243, 0.1); 
+            color: var(--primary); border-radius: 8px; font-weight: bold; margin-top: 10px;
+        }
 
-        /* Formularze i strony */
+        .btn-msg {
+            width: 100%; margin-top: 15px; padding: 12px; border: none;
+            border-radius: 10px; background: var(--primary); color: white;
+            font-weight: bold; cursor: pointer; transition: 0.2s;
+        }
+        .btn-msg:active { transform: scale(0.98); }
+
+        /* Modal - Okienko na środku */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(4px);
+            display: none; align-items: center; justify-content: center; z-index: 1000;
+        }
+        .modal {
+            background: var(--card); width: 85%; max-width: 350px;
+            padding: 25px; border-radius: 20px; border: 1px solid var(--border);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4); text-align: center;
+        }
+        .modal h2 { margin-top: 0; font-size: 18px; color: var(--primary); }
+        .modal textarea {
+            width: 100%; height: 100px; background: #0d1117; border: 1px solid var(--border);
+            border-radius: 12px; color: white; padding: 12px; margin: 15px 0;
+            box-sizing: border-box; font-family: inherit; resize: none;
+        }
+        .modal-btns { display: flex; gap: 10px; }
+        .modal-btn { 
+            flex: 1; padding: 12px; border-radius: 10px; border: none; 
+            font-weight: bold; cursor: pointer; 
+        }
+        .btn-send { background: var(--primary); color: white; }
+        .btn-cancel { background: #30363d; color: white; }
+
+        /* Navbar */
+        .navbar {
+            position: fixed; bottom: 0; width: 100%; background: rgba(22, 27, 34, 0.9);
+            backdrop-filter: blur(10px); display: flex; border-top: 1px solid var(--border);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .nav-item { flex: 1; text-align: center; padding: 15px 0; color: var(--sec); cursor: pointer; font-size: 10px; }
+        .nav-item.active { color: var(--primary); }
+        .nav-icon { font-size: 20px; display: block; margin-bottom: 4px; }
+
+        /* Formularze */
         .page { display: none; }
         .page.active { display: block; }
+        input, select { 
+            width: 100%; padding: 14px; background: var(--card); border: 1px solid var(--border);
+            border-radius: 12px; color: white; margin-bottom: 15px; box-sizing: border-box;
+        }
 
-        input, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        .btn { background: var(--primary); color: white; border: none; padding: 14px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-
-        /* Navbar dół */
-        .navbar { position: fixed; bottom: 0; width: 100%; background: white; display: flex; border-top: 1px solid #ddd; padding-bottom: env(safe-area-inset-bottom); }
-        .nav-item { flex: 1; text-align: center; padding: 10px 0; font-size: 11px; color: var(--sec); cursor: pointer; position: relative; }
-        .nav-item.active { color: var(--primary); }
-        .nav-icon { font-size: 20px; display: block; }
-        .badge { position: absolute; top: 5px; right: 25%; background: var(--err); width: 8px; height: 8px; border-radius: 50%; display: none; }
-
-        /* Profil */
-        .profile-img { width: 80px; height: 80px; border-radius: 50%; background: #ddd; margin: 0 auto 10px; background-size: cover; border: 2px solid var(--primary); }
+        /* Wiadomości */
+        .message-bubble {
+            background: var(--card); padding: 15px; border-radius: 15px; 
+            margin-bottom: 10px; border-left: 4px solid var(--primary);
+        }
     </style>
 </head>
 <body>
 
-<header>Korepetycje Plus</header>
+<header>
+    <h1>KOREPETYCJE PRO</h1>
+</header>
 
-<div id="homePage" class="page active">
+<div id="home" class="page active">
     <div class="tabs">
-        <div class="tab active" id="tabTutor" onclick="setCategory('tutor')">Korepetytorzy</div>
-        <div class="tab" id="tabStudent" onclick="setCategory('student')">Uczniowie</div>
+        <div class="tab active" onclick="switchCat('tutor', this)">Korepetytorzy</div>
+        <div class="tab" onclick="switchCat('student', this)">Uczniowie</div>
     </div>
     <div class="container" id="adsList"></div>
 </div>
 
-<div id="messagesPage" class="page">
+<div id="messages" class="page">
     <div class="container">
-        <h2>Twoje Wiadomości</h2>
-        <div id="messagesList">
-            <p style="color:#999; text-align:center;">Brak nowych wiadomości</p>
-        </div>
+        <h2 style="color: var(--primary)">Wiadomości</h2>
+        <div id="msgsList"></div>
     </div>
 </div>
 
-<div id="addPage" class="page">
+<div id="add" class="page">
     <div class="container">
-        <h2>Nowe ogłoszenie</h2>
-        <select id="adCat" style="width:100%; padding:10px; border-radius:8px; margin-bottom:10px;">
+        <h2 style="color: var(--primary)">Dodaj Ogłoszenie</h2>
+        <select id="newCat">
             <option value="tutor">Jestem Korepetytorem</option>
             <option value="student">Jestem Uczniem</option>
         </select>
-        <input type="text" id="subject" placeholder="Przedmiot (np. Matematyka)">
-        <input type="text" id="adPrice" placeholder="Cena (np. 60 zł/h)">
-        <textarea id="desc" placeholder="Opis ogłoszenia..." rows="4"></textarea>
-        <button class="btn" onclick="saveAd()">Opublikuj ogłoszenie</button>
+        <input type="text" id="newSub" placeholder="Przedmiot">
+        <input type="text" id="newPrice" placeholder="Cena (np. 70 zł/h)">
+        <textarea id="newDesc" style="width:100%; height:100px; background:var(--card); border:1px solid var(--border); border-radius:12px; color:white; padding:12px; margin-bottom:15px; box-sizing:border-box;" placeholder="Opis..."></textarea>
+        <button class="btn-msg" onclick="publishAd()">Opublikuj Ogłoszenie</button>
     </div>
 </div>
 
-<div id="accountPage" class="page">
-    <div class="container" id="accountContent">
+<div id="account" class="page">
+    <div class="container" id="accContent"></div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+        <h2 id="modalTitle">Napisz wiadomość</h2>
+        <textarea id="modalText" placeholder="Wpisz treść wiadomości..."></textarea>
+        <div class="modal-btns">
+            <button class="modal-btn btn-cancel" onclick="closeModal()">Anuluj</button>
+            <button class="modal-btn btn-send" onclick="confirmSend()">Wyślij</button>
         </div>
+    </div>
 </div>
 
 <nav class="navbar">
-    <div class="nav-item active" onclick="showPage('homePage', this)">
-        <span class="nav-icon">🏠</span>Ogłoszenia
-    </div>
-    <div class="nav-item" onclick="showPage('messagesPage', this)">
-        <span class="nav-icon">✉️</span>Wiadomości
-        <div id="msgBadge" class="badge"></div>
-    </div>
-    <div class="nav-item" onclick="showPage('addPage', this)">
-        <span class="nav-icon">➕</span>Dodaj
-    </div>
-    <div class="nav-item" onclick="showPage('accountPage', this)">
-        <span class="nav-icon">👤</span>Profil
-    </div>
+    <div class="nav-item active" onclick="showP('home', this)"><span class="nav-icon">💎</span>Eksploruj</div>
+    <div class="nav-item" onclick="showP('messages', this)"><span class="nav-icon">💬</span>Czaty</div>
+    <div class="nav-item" onclick="showP('add', this)"><span class="nav-icon">✨</span>Dodaj</div>
+    <div class="nav-item" onclick="showP('account', this)"><span class="nav-icon">⚙️</span>Profil</div>
 </nav>
 
 <script>
-    let cat = 'tutor';
-    let user = JSON.parse(localStorage.getItem('kp_user')) || null;
-    let ads = JSON.parse(localStorage.getItem('kp_ads')) || [];
-    let msgs = JSON.parse(localStorage.getItem('kp_msgs')) || [];
+    let currentCat = 'tutor';
+    let user = JSON.parse(localStorage.getItem('pro_user')) || null;
+    let ads = JSON.parse(localStorage.getItem('pro_ads')) || [];
+    let msgs = JSON.parse(localStorage.getItem('pro_msgs')) || [];
+    let targetAd = null;
 
-    function showPage(id, el) {
+    function showP(id, el) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         el.classList.add('active');
-        
-        if(id === 'homePage') renderAds();
-        if(id === 'messagesPage') renderMessages();
-        if(id === 'accountPage') renderAccount();
+        if(id === 'home') renderAds();
+        if(id === 'messages') renderMsgs();
+        if(id === 'account') renderAcc();
     }
 
-    function setCategory(c) {
-        cat = c;
-        document.getElementById('tabTutor').classList.toggle('active', c === 'tutor');
-        document.getElementById('tabStudent').classList.toggle('active', c === 'student');
+    function switchCat(c, el) {
+        currentCat = c;
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
         renderAds();
     }
 
-    // LOGIKA OGŁOSZEŃ
-    function saveAd() {
-        if(!user) return alert("Zaloguj się w zakładce Profil!");
-        const ad = {
-            id: Date.now(),
-            cat: document.getElementById('adCat').value,
-            sub: document.getElementById('subject').value,
-            price: document.getElementById('adPrice').value,
-            desc: document.getElementById('desc').value,
-            author: user.name,
-            authorEmail: user.email
-        };
-        ads.push(ad);
-        localStorage.setItem('kp_ads', JSON.stringify(ads));
-        alert("Dodano!");
-        showPage('homePage', document.querySelectorAll('.nav-item')[0]);
-    }
-
     function renderAds() {
-        const div = document.getElementById('adsList');
-        div.innerHTML = '';
-        ads.filter(a => a.cat === cat).slice().reverse().forEach(a => {
-            div.innerHTML += `
+        const list = document.getElementById('adsList');
+        list.innerHTML = '';
+        ads.filter(a => a.cat === currentCat).slice().reverse().forEach(a => {
+            list.innerHTML += `
                 <div class="ad-card">
-                    <small>👤 ${a.author}</small>
+                    <div style="color: var(--primary); font-size: 12px; margin-bottom: 5px;">@${a.author}</div>
                     <h3>${a.sub}</h3>
                     <p>${a.desc}</p>
-                    <div class="price">${a.price}</div>
-                    <button class="msg-btn" onclick="sendMsgPrompt('${a.author}', '${a.authorEmail}')">📩 Napisz wiadomość</button>
+                    <div class="price-tag">${a.price}</div>
+                    <button class="btn-msg" onclick="openModal('${a.author}', '${a.email}')">Wyślij wiadomość</button>
                 </div>
             `;
         });
     }
 
-    // LOGIKA WIADOMOŚCI
-    function sendMsgPrompt(toName, toEmail) {
-        if(!user) return alert("Musisz się zalogować, by pisać!");
-        const txt = prompt(`Napisz wiadomość do: ${toName}`);
+    // MODAL LOGIC
+    function openModal(name, email) {
+        if(!user) return alert("Zaloguj się w zakładce Profil!");
+        targetAd = { name, email };
+        document.getElementById('modalTitle').innerText = `Wiadomość do ${name}`;
+        document.getElementById('modalOverlay').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('modalOverlay').style.display = 'none';
+        document.getElementById('modalText').value = '';
+    }
+
+    function confirmSend() {
+        const txt = document.getElementById('modalText').value;
         if(!txt) return;
+        msgs.push({ to: targetAd.email, from: user.name, text: txt, date: new Date().toLocaleTimeString() });
+        localStorage.setItem('pro_msgs', JSON.stringify(msgs));
+        closeModal();
+        alert("Wiadomość wysłana pomyślnie!");
+    }
 
-        const newMsg = {
-            toEmail: toEmail,
-            fromName: user.name,
-            text: txt,
-            date: new Date().toLocaleTimeString()
+    function renderMsgs() {
+        const list = document.getElementById('msgsList');
+        list.innerHTML = '';
+        const my = msgs.filter(m => m.to === user?.email);
+        if(my.length === 0) list.innerHTML = '<p style="text-align:center; color:var(--sec);">Brak nowych wiadomości.</p>';
+        my.slice().reverse().forEach(m => {
+            list.innerHTML += `
+                <div class="message-bubble">
+                    <b style="color:var(--primary)">${m.from}</b> <small style="color:var(--sec); float:right">${m.date}</small>
+                    <p style="margin: 10px 0 0 0; font-size: 14px;">${m.text}</p>
+                </div>
+            `;
+        });
+    }
+
+    function publishAd() {
+        if(!user) return alert("Najpierw stwórz profil!");
+        const ad = {
+            cat: document.getElementById('newCat').value,
+            sub: document.getElementById('newSub').value,
+            price: document.getElementById('newPrice').value,
+            desc: document.getElementById('newDesc').value,
+            author: user.name,
+            email: user.email
         };
-        msgs.push(newMsg);
-        localStorage.setItem('kp_msgs', JSON.stringify(msgs));
-        alert("Wysłano!");
-        updateBadge();
+        ads.push(ad);
+        localStorage.setItem('pro_ads', JSON.stringify(ads));
+        alert("Ogłoszenie dodane!");
+        showP('home', document.querySelectorAll('.nav-item')[0]);
     }
 
-    function renderMessages() {
-        const div = document.getElementById('messagesList');
-        div.innerHTML = '';
-        const myMsgs = msgs.filter(m => m.toEmail === user?.email);
-        
-        if(myMsgs.length === 0) {
-            div.innerHTML = '<p style="text-align:center; color:#999;">Brak wiadomości do Ciebie.</p>';
-        } else {
-            myMsgs.slice().reverse().forEach(m => {
-                div.innerHTML += `
-                    <div class="msg-item">
-                        <b>Od: ${m.fromName} <small style="color:#999; font-weight:normal;">(${m.date})</small></b>
-                        <span>${m.text}</span>
-                    </div>
-                `;
-            });
-        }
-        document.getElementById('msgBadge').style.display = 'none';
-    }
-
-    function updateBadge() {
-        if(!user) return;
-        const count = msgs.filter(m => m.toEmail === user.email).length;
-        if(count > 0) document.getElementById('msgBadge').style.display = 'block';
-    }
-
-    // PROFIL
-    function renderAccount() {
-        const div = document.getElementById('accountContent');
+    function renderAcc() {
+        const div = document.getElementById('accContent');
         if(!user) {
             div.innerHTML = `
-                <h2>Zaloguj się</h2>
-                <input type="text" id="loginName" placeholder="Twój Nick">
-                <input type="email" id="loginEmail" placeholder="Twój E-mail">
-                <button class="btn" onclick="login()">Stwórz profil</button>
+                <h2>Stwórz Profil</h2>
+                <input type="text" id="accName" placeholder="Twój Nick">
+                <input type="email" id="accEmail" placeholder="Twój Email">
+                <button class="btn-msg" onclick="login()">Zapisz i Startuj</button>
             `;
         } else {
             div.innerHTML = `
-                <div style="text-align:center;">
-                    <div class="profile-img"></div>
-                    <h2>Witaj, ${user.name}!</h2>
-                    <p>${user.email}</p>
-                    <button class="btn" style="background:#666" onclick="logout()">Wyloguj</button>
+                <div style="text-align:center; padding: 30px;">
+                    <div style="width:80px; height:80px; background:var(--primary); border-radius:50%; margin: 0 auto 15px; display:flex; align-items:center; justify-content:center; font-size:30px;">👤</div>
+                    <h2>${user.name}</h2>
+                    <p style="color:var(--sec)">${user.email}</p>
+                    <button class="btn-msg" style="background:#30363d; margin-top:40px;" onclick="logout()">Wyloguj</button>
                 </div>
             `;
         }
     }
 
     function login() {
-        const n = document.getElementById('loginName').value;
-        const e = document.getElementById('loginEmail').value;
-        if(!n || !e) return alert("Uzupełnij dane!");
+        const n = document.getElementById('accName').value;
+        const e = document.getElementById('accEmail').value;
+        if(!n || !e) return;
         user = { name: n, email: e };
-        localStorage.setItem('kp_user', JSON.stringify(user));
-        renderAccount();
-        updateBadge();
+        localStorage.setItem('pro_user', JSON.stringify(user));
+        renderAcc();
     }
 
-    function logout() {
-        user = null;
-        localStorage.removeItem('kp_user');
-        renderAccount();
-    }
+    function logout() { user = null; localStorage.removeItem('pro_user'); renderAcc(); }
 
     renderAds();
-    updateBadge();
 </script>
 
 </body>
