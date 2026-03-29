@@ -24,7 +24,7 @@
             background-color: var(--bg);
             color: var(--text);
             margin: 0;
-            padding-bottom: 100px; /* Miejsce na większy pasek */
+            padding-bottom: 110px;
         }
 
         header {
@@ -40,11 +40,33 @@
 
         .container { padding: 15px; max-width: 500px; margin: 0 auto; }
 
+        /* Przełącznik roli na stronie głównej */
+        .role-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .role-btn {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--card);
+            color: var(--sec);
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .role-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
         #toast {
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
             background: var(--primary); color: white; padding: 12px 25px;
             border-radius: 50px; font-weight: bold; z-index: 2000;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
             display: none;
         }
 
@@ -59,32 +81,30 @@
         }
 
         .btn-main {
-            width: 100%; padding: 14px; border: none; border-radius: 12px;
+            width: 100%; padding: 16px; border: none; border-radius: 14px;
             background: var(--primary); color: white; font-weight: 800;
-            cursor: pointer; margin-top: 10px; font-size: 15px;
+            cursor: pointer; margin-top: 10px; font-size: 16px;
         }
 
-        /* --- POWIĘKSZONY PASEK DOLNY --- */
+        /* POWIĘKSZONY PASEK DOLNY */
         .navbar {
             position: fixed; bottom: 0; width: 100%; background: #161b22;
             display: flex; border-top: 1px solid var(--border);
-            padding: 12px 0;
-            padding-bottom: calc(12px + env(safe-area-inset-bottom));
+            padding: 15px 0;
+            padding-bottom: calc(15px + env(safe-area-inset-bottom));
             z-index: 1000;
         }
         .nav-item { 
             flex: 1; text-align: center; color: var(--sec); 
-            font-size: 13px; cursor: pointer; position: relative;
-            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            font-size: 14px; cursor: pointer; position: relative;
+            display: flex; flex-direction: column; align-items: center; gap: 6px;
         }
         .nav-item.active { color: var(--primary); font-weight: bold; }
-        
-        .nav-icon { font-size: 22px; }
+        .nav-icon { font-size: 26px; }
 
-        /* Kropka powiadomienia */
         #chat-dot {
-            position: absolute; top: 0; right: 25%;
-            width: 10px; height: 10px; background: var(--danger);
+            position: absolute; top: -2px; right: 22%;
+            width: 12px; height: 12px; background: var(--danger);
             border-radius: 50%; border: 2px solid #161b22;
             display: none;
         }
@@ -102,7 +122,7 @@
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 1500;
         }
-        .modal { background: var(--card); width: 85%; padding: 20px; border-radius: 20px; text-align: center; }
+        .modal { background: var(--card); width: 85%; padding: 25px; border-radius: 24px; text-align: center; }
     </style>
 </head>
 <body>
@@ -110,43 +130,49 @@
 <div id="toast">Sukces!</div>
 
 <header>
-    <h1 style="margin:0; font-size: 18px; letter-spacing: 2px;">EDU CORE PRO</h1>
+    <h1 style="margin:0; font-size: 20px; letter-spacing: 2px;">EDU CORE PRO</h1>
 </header>
 
 <div id="home" class="page active">
-    <div class="container" id="adsContainer">Ładowanie ogłoszeń...</div>
+    <div class="container">
+        <div class="role-selector">
+            <button class="role-btn active" id="btnStudent" onclick="setRole('student')">🎓 Uczeń</button>
+            <button class="role-btn" id="btnTutor" onclick="setRole('tutor')">👨‍🏫 Korepetytor</button>
+        </div>
+        <div id="adsContainer">Ładowanie...</div>
+    </div>
 </div>
 
 <div id="messages" class="page">
     <div class="container">
-        <h2 style="color: var(--primary)">Twoje Rozmowy</h2>
+        <h2 style="color: var(--primary)">Twoje Rozmowy 💬</h2>
         <div id="msgsContainer">Zaloguj się w zakładce Profil.</div>
     </div>
 </div>
 
 <div id="add" class="page">
     <div class="container">
-        <h2>Nowe Ogłoszenie</h2>
-        <input type="text" id="addSub" placeholder="Przedmiot (np. Fizyka)">
-        <input type="text" id="addPrice" placeholder="Cena (np. 70 zł/h)">
-        <textarea id="addDesc" placeholder="Opis oferty..."></textarea>
-        <button class="btn-main" onclick="postAd()">Dodaj na stałe</button>
+        <h2>Nowe Ogłoszenie ➕</h2>
+        <input type="text" id="addSub" placeholder="Przedmiot (np. Matematyka)">
+        <input type="text" id="addPrice" placeholder="Cena (np. 60 zł/h)">
+        <textarea id="addDesc" rows="4" placeholder="Opis Twojej oferty..."></textarea>
+        <button class="btn-main" onclick="postAd()">Opublikuj ogłoszenie</button>
     </div>
 </div>
 
 <div id="profile" class="page">
     <div class="container" id="profileContent">
-        <h2>Twój Profil</h2>
+        <h2>Twój Profil ⚙️</h2>
         <input type="text" id="userName" placeholder="Twój Nick">
         <input type="email" id="userEmail" placeholder="Twój E-mail">
-        <button class="btn-main" onclick="saveUser()">Zapisz Profil</button>
+        <button class="btn-main" onclick="saveUser()">Zapisz i zacznij</button>
     </div>
 </div>
 
 <div class="modal-overlay" id="msgModal">
     <div class="modal">
         <h3 id="modalTitle">Napisz wiadomość</h3>
-        <textarea id="modalInput" placeholder="Twoja wiadomość..."></textarea>
+        <textarea id="modalInput" rows="4" placeholder="Treść wiadomości..."></textarea>
         <button class="btn-main" onclick="sendMessage()">Wyślij</button>
         <button class="btn-main" style="background: #30363d" onclick="closeModal()">Anuluj</button>
     </div>
@@ -154,7 +180,7 @@
 
 <nav class="navbar">
     <div class="nav-item active" onclick="nav('home', this)">
-        <span class="nav-icon">🏠</span> Eksploruj
+        <span class="nav-icon">🏠</span> Start
     </div>
     <div class="nav-item" onclick="nav('messages', this)">
         <div id="chat-dot"></div>
@@ -184,7 +210,15 @@
     const adminEmail = "milosz.marciniak9999@gmail.com";
 
     let user = JSON.parse(localStorage.getItem('edu_user'));
+    let currentRole = 'student';
     let activeTarget = null;
+
+    function setRole(role) {
+        currentRole = role;
+        document.getElementById('btnStudent').classList.toggle('active', role === 'student');
+        document.getElementById('btnTutor').classList.toggle('active', role === 'tutor');
+        renderAds();
+    }
 
     function nav(id, el) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -212,7 +246,7 @@
         if(n && e) {
             user = {name: n, email: e};
             localStorage.setItem('edu_user', JSON.stringify(user));
-            showToast("Profil zapisany!");
+            showToast("Zapisano profil!");
             renderProfile();
         }
     }
@@ -221,8 +255,8 @@
         if(user) {
             document.getElementById('profileContent').innerHTML = `
                 <div style="text-align:center; padding: 20px;">
-                    <h2 style="color: var(--primary)">${user.name}</h2>
-                    <p style="color:var(--sec)">${user.email}</p>
+                    <h2 style="color: var(--primary)">Cześć, ${user.name}! 👋</h2>
+                    <p style="color:var(--sec)">Twoje dane: ${user.email}</p>
                     <button class="btn-main" style="background: var(--danger); margin-top: 40px;" 
                         onclick="localStorage.clear(); location.reload();">🔴 Wyloguj się</button>
                 </div>`;
@@ -230,22 +264,25 @@
     }
 
     function postAd() {
-        if(!user) return showToast("Zaloguj się w Profilu!");
+        if(!user) return showToast("Najpierw uzupełnij Profil!");
         const sub = document.getElementById('addSub').value;
         const price = document.getElementById('addPrice').value;
         const desc = document.getElementById('addDesc').value;
-        if(!sub || !price) return;
+        if(!sub || !price) return showToast("Wypełnij pola!");
 
         db.ref('ads').push({
             sub, price, desc, owner: user.name, email: user.email, time: Date.now()
         }).then(() => {
-            showToast("Dodano!");
+            showToast("Ogłoszenie dodane!");
+            document.getElementById('addSub').value = '';
+            document.getElementById('addPrice').value = '';
+            document.getElementById('addDesc').value = '';
             nav('home', document.querySelector('.nav-item'));
         });
     }
 
     function deleteAd(key) {
-        if(confirm("Usunąć to ogłoszenie?")) {
+        if(confirm("Czy na pewno usunąć?")) {
             db.ref('ads').child(key).remove().then(() => showToast("Usunięto!"));
         }
     }
@@ -254,28 +291,40 @@
         db.ref('ads').on('value', (snap) => {
             const container = document.getElementById('adsContainer');
             container.innerHTML = '';
+            let hasContent = false;
+
             snap.forEach(child => {
                 const a = child.val();
                 const key = child.key;
-                const canDelete = user && (user.email === a.email || user.email === adminEmail);
                 
-                container.innerHTML += `
-                    <div class="ad-card">
-                        <small style="color:var(--primary)">@${a.owner}</small>
-                        <h3 style="margin:5px 0">${a.sub}</h3>
-                        <p style="font-size:14px; color:var(--sec)">${a.desc}</p>
-                        <div class="price-tag">${a.price}</div>
-                        <button class="btn-main" onclick="openModal('${a.owner}', '${a.email}')">📩 Napisz</button>
-                        ${canDelete ? `<button class="btn-main" style="background:var(--danger)" onclick="deleteAd('${key}')">🗑️ Usuń</button>` : ''}
-                    </div>`;
+                // Logika wyświetlania: Korepetytor widzi tylko swoje, Uczeń widzi wszystko
+                const isMyAd = user && user.email === a.email;
+                const isAdmin = user && user.email === adminEmail;
+
+                if (currentRole === 'student' || (currentRole === 'tutor' && isMyAd)) {
+                    hasContent = true;
+                    container.innerHTML += `
+                        <div class="ad-card">
+                            <small style="color:var(--primary)">@${a.owner}</small>
+                            <h3 style="margin:5px 0">${a.sub}</h3>
+                            <p style="font-size:14px; color:var(--sec)">${a.desc}</p>
+                            <div class="price-tag">${a.price}</div>
+                            ${!isMyAd ? `<button class="btn-main" onclick="openModal('${a.owner}', '${a.email}')">📩 Napisz</button>` : ''}
+                            ${(isMyAd || isAdmin) ? `<button class="btn-main" style="background:var(--danger)" onclick="deleteAd('${key}')">🗑️ Usuń</button>` : ''}
+                        </div>`;
+                }
             });
+
+            if (!hasContent) {
+                container.innerHTML = currentRole === 'student' ? "Brak dostępnych ofert." : "Nie masz jeszcze żadnych ogłoszeń.";
+            }
         });
     }
 
     function openModal(name, email) {
         if(!user) return showToast("Zaloguj się!");
-        if(user.email === email) return;
         activeTarget = {name, email};
+        document.getElementById('modalTitle').innerText = "Wiadomość do: " + name;
         document.getElementById('msgModal').style.display = 'flex';
     }
 
@@ -286,9 +335,10 @@
         if(!txt) return;
         db.ref('messages').push({
             to: activeTarget.email, from: user.name, fromEmail: user.email,
-            text: txt, date: new Date().toLocaleString(), read: false
+            text: txt, date: new Date().toLocaleString()
         }).then(() => {
             showToast("Wysłano!");
+            document.getElementById('modalInput').value = '';
             closeModal();
         });
     }
@@ -298,22 +348,24 @@
         db.ref('messages').on('value', (snap) => {
             const container = document.getElementById('msgsContainer');
             container.innerHTML = '';
+            let count = 0;
             snap.forEach(child => {
                 const m = child.val();
                 if(m.to === user.email) {
+                    count++;
                     container.innerHTML += `
                         <div class="ad-card" style="border-left: 4px solid var(--primary)">
                             <small>Od: <b>${m.from}</b> (${m.date})</small>
                             <p>${m.text}</p>
-                            <button class="btn-main" style="padding: 8px; font-size: 12px; background: #30363d" 
+                            <button class="btn-main" style="padding: 10px; font-size: 13px; background: #30363d" 
                                 onclick="openModal('${m.from}', '${m.fromEmail}')">Odpisz</button>
                         </div>`;
                 }
             });
+            if(count === 0) container.innerHTML = "Brak nowych wiadomości.";
         });
     }
 
-    // Nasłuchiwanie nowych wiadomości dla kropki
     if(user) {
         db.ref('messages').on('child_added', (snap) => {
             const m = snap.val();
