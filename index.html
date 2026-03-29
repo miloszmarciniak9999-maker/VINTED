@@ -39,7 +39,6 @@
 
         .container { padding: 15px; max-width: 500px; margin: 0 auto; }
 
-        /* Nowoczesne powiadomienie zamiast brzydkich okienek */
         #toast {
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
             background: var(--primary); color: white; padding: 12px 25px;
@@ -64,7 +63,6 @@
             cursor: pointer; margin-top: 10px;
         }
 
-        /* Navbar */
         .navbar {
             position: fixed; bottom: 0; width: 100%; background: #161b22;
             display: flex; border-top: 1px solid var(--border);
@@ -79,9 +77,9 @@
         input, textarea { 
             width: 100%; padding: 15px; background: #0d1117; border: 1px solid var(--border);
             border-radius: 12px; color: white; margin-bottom: 10px; box-sizing: border-box;
+            font-size: 16px;
         }
 
-        /* Modal do pisania wiadomości */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 1000;
@@ -104,15 +102,15 @@
 <div id="messages" class="page">
     <div class="container">
         <h2 style="color: var(--primary)">Twoje Rozmowy</h2>
-        <div id="msgsContainer">Zaloguj się, aby odbierać wiadomości.</div>
+        <div id="msgsContainer">Zaloguj się w zakładce Profil, aby odbierać wiadomości.</div>
     </div>
 </div>
 
 <div id="add" class="page">
     <div class="container">
         <h2>Nowe Ogłoszenie</h2>
-        <input type="text" id="addSub" placeholder="Przedmiot (np. Matematyka)">
-        <input type="text" id="addPrice" placeholder="Cena (np. 60 zł/h)">
+        <input type="text" id="addSub" placeholder="Przedmiot (np. Fizyka)">
+        <input type="text" id="addPrice" placeholder="Cena (np. 70 zł/h)">
         <textarea id="addDesc" placeholder="Opis oferty..."></textarea>
         <button class="btn-main" onclick="postAd()">Dodaj na stałe</button>
     </div>
@@ -121,6 +119,7 @@
 <div id="profile" class="page">
     <div class="container" id="profileContent">
         <h2>Twój Profil</h2>
+        <p style="font-size: 14px; color: var(--sec);">Wprowadź dane, aby system wiedział komu wysyłać wiadomości.</p>
         <input type="text" id="userName" placeholder="Twój Nick">
         <input type="email" id="userEmail" placeholder="Twój E-mail">
         <button class="btn-main" onclick="saveUser()">Zapisz Profil</button>
@@ -129,7 +128,7 @@
 
 <div class="modal-overlay" id="msgModal">
     <div class="modal">
-        <h3 id="modalTitle">Napisz do użytkownika</h3>
+        <h3 id="modalTitle">Napisz wiadomość</h3>
         <textarea id="modalInput" placeholder="Twoja wiadomość..."></textarea>
         <button class="btn-main" onclick="sendMessage()">Wyślij</button>
         <button class="btn-main" style="background: #30363d" onclick="closeModal()">Anuluj</button>
@@ -144,15 +143,15 @@
 </nav>
 
 <script>
-    // TWOJA KONFIGURACJA
+    // --- TWOJA PEŁNA KONFIGURACJA Z LINKIEM BELGIA ---
     const firebaseConfig = {
         apiKey: "AIzaSyAbs_Z_Oqy2FrWP3CuGK9w9qjDMYGDhgck",
         authDomain: "educore-5c9f4.firebaseapp.com",
+        databaseURL: "https://educore-5c9f4-default-rtdb.europe-west1.firebasedatabase.app/",
         projectId: "educore-5c9f4",
         storageBucket: "educore-5c9f4.firebasestorage.app",
         messagingSenderId: "213055938628",
-        appId: "1:213055938628:web:408b3beb4273d4f6f59c11",
-        databaseURL: "https://educore-5c9f4-default-rtdb.firebaseio.com/"
+        appId: "1:213055938628:web:408b3beb4273d4f6f59c11"
     };
 
     firebase.initializeApp(firebaseConfig);
@@ -185,6 +184,8 @@
             localStorage.setItem('edu_user', JSON.stringify(user));
             showToast("Profil zapisany!");
             renderProfile();
+        } else {
+            showToast("Wypełnij oba pola!");
         }
     }
 
@@ -193,49 +194,65 @@
             document.getElementById('profileContent').innerHTML = `
                 <div style="text-align:center">
                     <h2>Witaj, ${user.name}!</h2>
-                    <p style="color:var(--sec)">${user.email}</p>
-                    <button class="btn-main" style="background: #da3633" onclick="localStorage.clear(); location.reload();">Wyloguj się</button>
+                    <p style="color:var(--sec)">Twoje konto: ${user.email}</p>
+                    <button class="btn-main" style="background: #da3633" onclick="localStorage.clear(); location.reload();">Wyloguj i usuń dane</button>
                 </div>`;
         }
     }
 
     function postAd() {
-        if(!user) return showToast("Zaloguj się w Profilu!");
+        if(!user) return showToast("Zaloguj się najpierw w Profilu!");
+        const sub = document.getElementById('addSub').value;
+        const price = document.getElementById('addPrice').value;
+        const desc = document.getElementById('addDesc').value;
+
+        if(!sub || !price) return showToast("Podaj chociaż przedmiot i cenę!");
+
         const ad = {
-            sub: document.getElementById('addSub').value,
-            price: document.getElementById('addPrice').value,
-            desc: document.getElementById('addDesc').value,
+            sub: sub,
+            price: price,
+            desc: desc,
             owner: user.name,
             email: user.email,
             time: Date.now()
         };
-        db.ref('ads').push(ad);
-        showToast("Dodano ogłoszenie!");
-        nav('home', document.querySelector('.nav-item'));
+
+        db.ref('ads').push(ad).then(() => {
+            showToast("Dodano ogłoszenie!");
+            document.getElementById('addSub').value = '';
+            document.getElementById('addPrice').value = '';
+            document.getElementById('addDesc').value = '';
+            nav('home', document.querySelector('.nav-item'));
+        });
     }
 
     function renderAds() {
         db.ref('ads').on('value', (snap) => {
             const container = document.getElementById('adsContainer');
+            if(!snap.exists()) {
+                container.innerHTML = "Brak ogłoszeń. Dodaj pierwsze!";
+                return;
+            }
             container.innerHTML = '';
             snap.forEach(child => {
                 const a = child.val();
                 container.innerHTML += `
                     <div class="ad-card">
-                        <small style="color:var(--primary)">@${a.owner}</small>
+                        <small style="color:var(--primary)">Dodane przez: @${a.owner}</small>
                         <h3 style="margin:5px 0">${a.sub}</h3>
                         <p style="font-size:14px; color:var(--sec)">${a.desc}</p>
                         <div class="price-tag">${a.price}</div>
-                        <button class="btn-main" onclick="openModal('${a.owner}', '${a.email}')">📩 Napisz</button>
+                        <button class="btn-main" onclick="openModal('${a.owner}', '${a.email}')">📩 Wyślij wiadomość</button>
                     </div>`;
             });
         });
     }
 
     function openModal(name, email) {
-        if(!user) return showToast("Zaloguj się najpierw!");
+        if(!user) return showToast("Zaloguj się w Profilu!");
+        if(user.email === email) return showToast("To Twoje ogłoszenie!");
         activeTarget = {name, email};
-        document.getElementById('modalTitle').innerText = "Do: " + name;
+        document.getElementById('modalTitle').innerText = "Napisz do: " + name;
         document.getElementById('msgModal').style.display = 'flex';
     }
 
@@ -249,10 +266,12 @@
             from: user.name,
             fromEmail: user.email,
             text: txt,
-            date: new Date().toLocaleTimeString()
+            date: new Date().toLocaleString()
+        }).then(() => {
+            showToast("Wysłano wiadomość!");
+            document.getElementById('modalInput').value = '';
+            closeModal();
         });
-        showToast("Wysłano wiadomość!");
-        closeModal();
     }
 
     function renderMsgs() {
@@ -269,7 +288,7 @@
                         <div class="ad-card" style="border-left: 4px solid var(--primary)">
                             <small>Od: <b>${m.from}</b> (${m.date})</small>
                             <p>${m.text}</p>
-                            <button class="btn-main" style="padding: 8px; font-size: 12px" onclick="openModal('${m.from}', '${m.fromEmail}')">Odpisz</button>
+                            <button class="btn-main" style="padding: 8px; font-size: 12px; background: #30363d" onclick="openModal('${m.from}', '${m.fromEmail}')">Odpisz</button>
                         </div>`;
                 }
             });
@@ -277,8 +296,9 @@
         });
     }
 
-    // Start
+    // Start aplikacji
     renderAds();
+    if(user) renderProfile();
 </script>
 
 </body>
