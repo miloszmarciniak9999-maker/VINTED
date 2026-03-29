@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mój Portfel Vinted</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        :root { --bg: #121212; --card: #1e1e1e; --text: #ffffff; --sec: #999; --acc: #008080; --err: #ff5c5c; }
+        body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        .header { padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; }
+        .balance { text-align: center; padding: 30px 0; }
+        .amount { font-size: 42px; font-weight: bold; }
+        .label { color: var(--sec); font-size: 14px; }
+        .actions { display: flex; justify-content: center; gap: 30px; margin-bottom: 30px; }
+        .act { display: flex; flex-direction: column; align-items: center; font-size: 12px; }
+        .icon { width: 50px; height: 50px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; font-size: 20px; }
+        .history { background: #000; flex-grow: 1; padding: 20px; border-top-left-radius: 20px; border-top-right-radius: 20px; overflow-y: auto; }
+        .trans { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #222; }
+        .neg { color: var(--err); }
+        .form { background: var(--card); padding: 15px; border-top: 1px solid #333; }
+        input { background: #333; border: none; color: #fff; padding: 12px; border-radius: 8px; width: 90%; margin-bottom: 10px; font-size: 16px; }
+        .btns { display: flex; gap: 10px; }
+        button { flex: 1; padding: 15px; border: none; border-radius: 8px; color: #fff; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="header"><span>←</span><strong>Mój Portfel</strong><span>⚙️</span></div>
+    <div class="balance">
+        <div class="amount" id="total">0,00 zł</div>
+        <div class="label">Dostępne środki</div>
+    </div>
+    <div class="actions">
+        <div class="act"><div class="icon">🏦</div>Wypłać</div>
+        <div class="act"><div class="icon">🛒</div>Kup</div>
+        <div class="act"><div class="icon">❤️</div>Przekaż</div>
+    </div>
+    <div class="history" id="list"></div>
+    <div class="form">
+        <input type="number" id="val" placeholder="Wpisz kwotę (zł)" step="0.01">
+        <div class="btns">
+            <button onclick="add('earn')" style="background: var(--acc)">DODAJ</button>
+            <button onclick="add('out')" style="background: var(--err)">WYPŁAĆ</button>
+        </div>
+    </div>
+    <script>
+        let bal = parseFloat(localStorage.getItem('b')) || 0;
+        let hist = JSON.parse(localStorage.getItem('h')) || [];
+        function up() {
+            document.getElementById('total').innerText = bal.toFixed(2).replace('.', ',') + ' zł';
+            const l = document.getElementById('list'); l.innerHTML = '';
+            hist.slice().reverse().forEach(i => {
+                l.innerHTML += `<div class="trans"><div><b>${i.t}</b><br><small style="color:#999">${i.d}</small></div><div class="${i.ty==='out'?'neg':''}">${i.ty==='out'?'-':''}${i.a.toFixed(2).replace('.',',')} zł</div></div>`;
+            });
+            localStorage.setItem('b', bal); localStorage.setItem('h', JSON.stringify(hist));
+        }
+        function add(type) {
+            const v = parseFloat(document.getElementById('val').value);
+            if(!v || v <= 0) return;
+            const now = new Date().toLocaleDateString('pl-PL');
+            if(type==='earn') { bal += v; hist.push({t:'Sprzedane', a:v, ty:'in', d:now}); }
+            else { bal -= v; hist.push({t:'Wypłata na konto', a:v, ty:'out', d:now}); }
+            document.getElementById('val').value = ''; up();
+        }
+        up();
+        if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+    </script>
+</body>
+</html>
