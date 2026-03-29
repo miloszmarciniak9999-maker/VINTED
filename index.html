@@ -2,67 +2,140 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mój Portfel Vinted</title>
     <link rel="manifest" href="manifest.json">
     <style>
-        :root { --bg: #121212; --card: #1e1e1e; --text: #ffffff; --sec: #999; --acc: #008080; --err: #ff5c5c; }
-        body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        .header { padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; }
-        .balance { text-align: center; padding: 30px 0; }
-        .amount { font-size: 42px; font-weight: bold; }
-        .label { color: var(--sec); font-size: 14px; }
-        .actions { display: flex; justify-content: center; gap: 30px; margin-bottom: 30px; }
+        :root {
+            --bg: #000000;
+            --card: #121212;
+            --text: #ffffff;
+            --sec: #999999;
+            --acc: #008080;
+            --err: #ff5c5c;
+            --border: #1a1a1a;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0; padding: 0;
+            overscroll-behavior-y: contain;
+            user-select: none;
+        }
+
+        .header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--bg); z-index: 100; }
+        .pending { color: var(--sec); font-size: 14px; display: flex; justify-content: space-between; padding: 10px 20px; }
+
+        .balance-box { text-align: center; padding: 30px 0; }
+        .amount { font-size: 44px; font-weight: bold; margin: 5px 0; }
+        .label { color: var(--sec); font-size: 13px; }
+
+        .actions { display: flex; justify-content: center; gap: 40px; margin: 20px 0; }
         .act { display: flex; flex-direction: column; align-items: center; font-size: 12px; }
-        .icon { width: 50px; height: 50px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; font-size: 20px; }
-        .history { background: #000; flex-grow: 1; padding: 20px; border-top-left-radius: 20px; border-top-right-radius: 20px; overflow-y: auto; }
-        .trans { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #222; }
+        .icon { width: 55px; height: 55px; background: #222; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; font-size: 22px; }
+
+        .history { padding: 0 20px; border-top: 8px solid #080808; min-height: 400px; }
+        .month { color: var(--sec); font-size: 13px; padding: 20px 0 10px 0; }
+
+        .item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 0.5px solid var(--border); }
+        .item-info b { display: block; font-size: 15px; margin-bottom: 2px; }
+        .item-info small { color: var(--sec); font-size: 12px; }
+        .item-price { font-weight: bold; font-size: 15px; }
         .neg { color: var(--err); }
-        .form { background: var(--card); padding: 15px; border-top: 1px solid #333; }
-        input { background: #333; border: none; color: #fff; padding: 12px; border-radius: 8px; width: 90%; margin-bottom: 10px; font-size: 16px; }
+
+        /* Panel dolny do wpisywania */
+        .input-area { background: #111; padding: 15px; border-top: 1px solid #333; position: fixed; bottom: 0; width: 100%; box-sizing: border-box; }
+        input { background: #222; border: 1px solid #333; color: #fff; padding: 12px; width: 100%; border-radius: 5px; box-sizing: border-box; margin-bottom: 10px; font-size: 16px; }
         .btns { display: flex; gap: 10px; }
-        button { flex: 1; padding: 15px; border: none; border-radius: 8px; color: #fff; font-weight: bold; cursor: pointer; }
+        button { flex: 1; padding: 12px; border-radius: 5px; border: none; color: #fff; font-weight: bold; }
+
+        #ptr { text-align: center; height: 0; overflow: hidden; color: var(--acc); font-size: 12px; line-height: 40px; }
     </style>
 </head>
 <body>
-    <div class="header"><span>←</span><strong>Mój Portfel</strong><span>⚙️</span></div>
-    <div class="balance">
+
+    <div id="ptr">Odświeżanie...</div>
+
+    <div class="header"><span>←</span><strong>Mój Portfel Vinted</strong><span>⚙️</span></div>
+    
+    <div class="pending"><span>Oczekujące środki</span><span>0,00 zł ⓘ</span></div>
+
+    <div class="balance-box">
         <div class="amount" id="total">0,00 zł</div>
         <div class="label">Dostępne środki</div>
     </div>
+
     <div class="actions">
         <div class="act"><div class="icon">🏦</div>Wypłać</div>
         <div class="act"><div class="icon">🛒</div>Kup</div>
         <div class="act"><div class="icon">❤️</div>Przekaż</div>
     </div>
-    <div class="history" id="list"></div>
-    <div class="form">
-        <input type="number" id="val" placeholder="Wpisz kwotę (zł)" step="0.01">
-        <div class="btns">
-            <button onclick="add('earn')" style="background: var(--acc)">DODAJ</button>
-            <button onclick="add('out')" style="background: var(--err)">WYPŁAĆ</button>
+
+    <div class="history">
+        <div class="month">marca 2026</div>
+        <div id="list"></div>
+        <div class="item">
+            <div class="item-info"><b>Saldo początkowe</b><small>1 mar 2026</small></div>
+            <div class="item-price">0,00 zł</div>
         </div>
     </div>
+
+    <div style="height: 150px;"></div>
+
+    <div class="input-area">
+        <input type="number" id="val" placeholder="Wpisz kwotę zł (np. 130)">
+        <div class="btns">
+            <button onclick="add('in')" style="background: #008080;">DODAJ</button>
+            <button onclick="add('out')" style="background: #333;">WYPŁAĆ</button>
+        </div>
+    </div>
+
     <script>
-        let bal = parseFloat(localStorage.getItem('b')) || 0;
-        let hist = JSON.parse(localStorage.getItem('h')) || [];
-        function up() {
-            document.getElementById('total').innerText = bal.toFixed(2).replace('.', ',') + ' zł';
-            const l = document.getElementById('list'); l.innerHTML = '';
-            hist.slice().reverse().forEach(i => {
-                l.innerHTML += `<div class="trans"><div><b>${i.t}</b><br><small style="color:#999">${i.d}</small></div><div class="${i.ty==='out'?'neg':''}">${i.ty==='out'?'-':''}${i.a.toFixed(2).replace('.',',')} zł</div></div>`;
+        let b = parseFloat(localStorage.getItem('v_b')) || 0;
+        let h = JSON.parse(localStorage.getItem('v_h')) || [];
+
+        function render() {
+            document.getElementById('total').innerText = b.toFixed(2).replace('.', ',') + ' zł';
+            const list = document.getElementById('list');
+            list.innerHTML = '';
+            h.slice().reverse().forEach(i => {
+                list.innerHTML += `
+                    <div class="item">
+                        <div class="item-info"><b>${i.t}</b><small>${i.d}</small></div>
+                        <div class="item-price ${i.ty==='out'?'neg':''}">
+                            ${i.ty==='out'?'-':''}${i.a.toFixed(2).replace('.',',')} zł >
+                        </div>
+                    </div>`;
             });
-            localStorage.setItem('b', bal); localStorage.setItem('h', JSON.stringify(hist));
+            localStorage.setItem('v_b', b);
+            localStorage.setItem('v_h', JSON.stringify(h));
         }
+
         function add(type) {
             const v = parseFloat(document.getElementById('val').value);
-            if(!v || v <= 0) return;
-            const now = new Date().toLocaleDateString('pl-PL');
-            if(type==='earn') { bal += v; hist.push({t:'Sprzedane', a:v, ty:'in', d:now}); }
-            else { bal -= v; hist.push({t:'Wypłata na konto', a:v, ty:'out', d:now}); }
-            document.getElementById('val').value = ''; up();
+            if(!v) return;
+            const d = new Date().getDate() + " mar 2026";
+            if(type==='in') { b += v; h.push({t:'Sprzedane', a:v, ty:'in', d:d}); }
+            else { b -= v; h.push({t:'Wypłata na konto', a:v, ty:'out', d:d}); }
+            document.getElementById('val').value = '';
+            render();
         }
-        up();
+
+        // Pull to refresh
+        let startY = 0;
+        window.addEventListener('touchstart', e => startY = e.touches[0].pageY);
+        window.addEventListener('touchmove', e => {
+            if(window.scrollY === 0 && e.touches[0].pageY > startY + 60) {
+                document.getElementById('ptr').style.height = '40px';
+            }
+        });
+        window.addEventListener('touchend', () => {
+            setTimeout(() => { document.getElementById('ptr').style.height = '0'; render(); }, 600);
+        });
+
+        render();
         if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
     </script>
 </body>
