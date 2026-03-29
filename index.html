@@ -2,244 +2,222 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Mój Portfel Vinted</title>
-    <link rel="manifest" href="manifest.json">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Korepetycje - Znajdź Pomoc</title>
     <style>
         :root {
-            --bg: #000000;
-            --text: #ffffff;
-            --sec: #999999;
-            --acc: #00c2c2;
-            --err: #ff5c5c;
-            --border: #222222;
+            --primary: #008080;
+            --bg: #f4f7f6;
+            --white: #ffffff;
+            --text: #333;
+            --shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: var(--bg);
-            color: var(--text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            padding: 0;
-            overscroll-behavior-y: contain;
-            -webkit-tap-highlight-color: transparent;
+            background-color: var(--bg);
+            color: var(--text);
+            padding-bottom: 60px;
         }
 
-        /* Nagłówek */
-        .header {
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            background: var(--bg);
-            z-index: 10;
-        }
-        .header span { font-size: 20px; }
-
-        /* Oczekujące środki */
-        .pending {
-            color: var(--sec);
-            font-size: 14px;
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 20px;
-            margin-top: 5px;
-        }
-
-        /* Sekcja Salda - KLIKALNA */
-        .balance-box {
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 20px;
             text-align: center;
-            padding: 30px 0;
-            cursor: pointer;
+            box-shadow: var(--shadow);
         }
-        .amount { font-size: 48px; font-weight: 700; margin-bottom: 5px; }
-        .label { color: var(--sec); font-size: 14px; }
 
-        /* Przyciski Akcji */
-        .actions {
+        .tabs {
             display: flex;
             justify-content: center;
-            gap: 45px;
-            margin: 20px 0 40px 0;
-        }
-        .act { display: flex; flex-direction: column; align-items: center; font-size: 13px; color: var(--text); }
-        .icon {
-            width: 55px; height: 55px;
-            background: #1a1a1a;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            margin-bottom: 8px; font-size: 22px;
-            border: 1px solid #333;
+            background: var(--white);
+            margin-bottom: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
-        /* Historia Transakcji */
-        .history {
-            background: var(--bg);
-            padding: 0 20px 120px 20px;
-            border-top: 1px solid var(--border);
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            border-bottom: 3px solid transparent;
         }
-        .month { color: var(--sec); font-size: 14px; margin: 25px 0 15px 0; }
-        .item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 18px 0;
-            border-bottom: 0.5px solid var(--border);
-        }
-        .item-info b { display: block; font-size: 16px; margin-bottom: 4px; font-weight: 500; }
-        .item-info small { color: var(--sec); font-size: 13px; }
-        .item-price { font-weight: 600; font-size: 16px; display: flex; align-items: center; }
-        .item-price span { color: #555; margin-left: 10px; font-size: 18px; font-weight: normal; }
-        .neg { color: var(--err); }
 
-        /* Dolny pasek */
-        .navbar {
-            position: fixed;
-            bottom: 0;
+        .tab.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .container {
+            padding: 15px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .ad-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: var(--shadow);
+        }
+
+        .ad-card h3 { margin: 0 0 10px 0; color: var(--primary); }
+        .ad-card p { margin: 5px 0; font-size: 14px; }
+        .ad-card .price { font-weight: bold; color: #2ecc71; font-size: 16px; }
+        .ad-card .contact { 
+            margin-top: 10px; 
+            padding-top: 10px; 
+            border-top: 1px solid #eee; 
+            font-style: italic; 
+            color: #666;
+        }
+
+        /* Formularz dodawania */
+        .add-form {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: none; /* Ukryty domyślnie */
+        }
+
+        input, textarea, select {
             width: 100%;
-            background: #000;
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0 calc(12px + env(safe-area-inset-bottom));
-            border-top: 1px solid #222;
-            z-index: 100;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
         }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--sec); font-size: 11px; text-decoration: none; width: 20%; }
-        .nav-item.active { color: var(--acc); }
-        .nav-icon { font-size: 24px; margin-bottom: 4px; position: relative; }
-        .badge { position: absolute; top: -1px; right: -3px; background: var(--err); width: 9px; height: 9px; border-radius: 50%; border: 2px solid #000; }
 
-        /* Animacja odświeżania */
-        #refresh { text-align: center; height: 0; overflow: hidden; transition: 0.3s; color: var(--acc); font-size: 13px; line-height: 40px; }
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .fab {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
-    <div id="refresh">Odświeżanie...</div>
+<header>
+    <h1>Korepetycje Plus</h1>
+</header>
 
-    <div class="header">
-        <span>←</span>
-        <strong>Mój Portfel Vinted</strong>
-        <span>⚙️</span>
+<div class="tabs">
+    <div class="tab active" onclick="switchTab('tutor')">Korepetytorzy</div>
+    <div class="tab" onclick="switchTab('student')">Uczniowie</div>
+</div>
+
+<div class="container">
+    <div id="formSection" class="add-form">
+        <h2 id="formTitle">Dodaj ogłoszenie</h2>
+        <input type="text" id="subject" placeholder="Przedmiot (np. Matematyka)">
+        <input type="text" id="name" placeholder="Twoje Imię">
+        <input type="number" id="age" placeholder="Wiek">
+        <input type="text" id="price" placeholder="Cena za godzinę (np. 50 zł)">
+        <textarea id="desc" placeholder="Opis (czego uczysz / czego szukasz)"></textarea>
+        <input type="text" id="contact" placeholder="Kontakt (Tel lub E-mail)">
+        <button class="btn" onclick="saveAd()">Opublikuj ogłoszenie</button>
+        <button class="btn" style="background:#666; margin-top:5px;" onclick="toggleForm()">Anuluj</button>
     </div>
 
-    <div class="pending">
-        <span>Oczekujące środki</span>
-        <span>0,00 zł ⓘ</span>
-    </div>
+    <div id="adsList"></div>
+</div>
 
-    <div class="balance-box" onclick="askAmount()">
-        <div class="amount" id="total">0,00 zł</div>
-        <div class="label">Dostępne środki</div>
-    </div>
+<div class="fab" onclick="toggleForm()">+</div>
 
-    <div class="actions">
-        <div class="act"><div class="icon">🏦</div>Wypłać</div>
-        <div class="act"><div class="icon">🛒</div>Kup</div>
-        <div class="act"><div class="icon">❤️</div>Przekaż</div>
-    </div>
+<script>
+    let currentTab = 'tutor';
+    let ads = JSON.parse(localStorage.getItem('korepetycje_ads')) || [
+        { type: 'tutor', subject: 'Matematyka', name: 'Ania', age: 22, price: '60 zł', desc: 'Pomogę w przygotowaniu do matury podstawowej.', contact: 'ania@mail.com' },
+        { type: 'student', subject: 'Fizyka', name: 'Marek', age: 16, price: 'do 50 zł', desc: 'Szukam kogoś kto wytłumaczy mi dynamikę.', contact: '555-666-777' }
+    ];
 
-    <div class="history">
-        <div class="month">marzec 2026</div>
-        <div id="list">
-            </div>
+    function switchTab(tab) {
+        currentTab = tab;
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        event.target.classList.add('active');
+        renderAds();
+    }
+
+    function toggleForm() {
+        const form = document.getElementById('formSection');
+        form.style.display = (form.style.display === 'block') ? 'none' : 'block';
+        document.getElementById('formTitle').innerText = currentTab === 'tutor' ? 'Dodaj jako Korepetytor' : 'Dodaj jako Uczeń';
+    }
+
+    function saveAd() {
+        const ad = {
+            type: currentTab,
+            subject: document.getElementById('subject').value,
+            name: document.getElementById('name').value,
+            age: document.getElementById('age').value,
+            price: document.getElementById('price').value,
+            desc: document.getElementById('desc').value,
+            contact: document.getElementById('contact').value
+        };
+
+        if(!ad.subject || !ad.contact) return alert("Wypełnij przedmiot i kontakt!");
+
+        ads.push(ad);
+        localStorage.setItem('korepetycje_ads', JSON.stringify(ads));
+        toggleForm();
+        renderAds();
         
-        <div class="month" style="margin-top: 40px;">Saldo początkowe</div>
-        <div class="item">
-            <div class="item-info">
-                <b>Saldo początkowe</b>
-                <small>1 mar 2026</small>
-            </div>
-            <div class="item-price">0,00 zł <span>&rsaquo;</span></div>
-        </div>
-    </div>
+        // Czyścimy pola
+        document.querySelectorAll('input, textarea').forEach(i => i.value = '');
+    }
 
-    <nav class="navbar">
-        <div class="nav-item">
-            <div class="nav-icon">🏠</div>
-            Nowości
-        </div>
-        <div class="nav-item">
-            <div class="nav-icon">🔍</div>
-            Szukaj
-        </div>
-        <div class="nav-item">
-            <div class="nav-icon">➕</div>
-            Sprzedaj
-        </div>
-        <div class="nav-item">
-            <div class="nav-icon">✉️<div class="badge"></div></div>
-            Wiadomości
-        </div>
-        <div class="nav-item active">
-            <div class="nav-icon">👤</div>
-            Profil
-        </div>
-    </nav>
+    function renderAds() {
+        const list = document.getElementById('adsList');
+        list.innerHTML = '';
 
-    <script>
-        let bal = parseFloat(localStorage.getItem('v_bal')) || 0;
-        let hist = JSON.parse(localStorage.getItem('v_hist')) || [];
+        const filtered = ads.filter(ad => ad.type === currentTab);
 
-        function render() {
-            document.getElementById('total').innerText = bal.toFixed(2).replace('.', ',') + ' zł';
-            const list = document.getElementById('list');
-            list.innerHTML = '';
-            
-            hist.slice().reverse().forEach(i => {
-                const isNeg = i.ty === 'out';
-                list.innerHTML += `
-                    <div class="item">
-                        <div class="item-info">
-                            <b>${i.t}</b>
-                            <small>${i.d}</small>
-                        </div>
-                        <div class="item-price ${isNeg ? 'neg' : ''}">
-                            ${isNeg ? '-' : ''}${i.a.toFixed(2).replace('.', ',')} zł <span>&rsaquo;</span>
-                        </div>
-                    </div>
-                `;
-            });
-            localStorage.setItem('v_bal', bal);
-            localStorage.setItem('v_hist', JSON.stringify(hist));
-        }
-
-        function askAmount() {
-            const mode = confirm("Kliknij OK, aby dodać SPRZEDAŻ.\nKliknij ANULUJ, aby dodać WYPŁATĘ.");
-            const val = prompt("Wpisz kwotę (np. 130):");
-            const num = parseFloat(val);
-            
-            if(!num || num <= 0) return;
-
-            const d = new Date().getDate() + ' mar 2026';
-            if(mode) {
-                bal += num;
-                hist.push({t: 'Sprzedane', a: num, ty: 'in', d: d});
-            } else {
-                bal -= num;
-                hist.push({t: 'Wypłata na konto bankowe', a: num, ty: 'out', d: d});
-            }
-            render();
-        }
-
-        // Pull to refresh logic
-        let startY = 0;
-        window.addEventListener('touchstart', e => { startY = e.touches[0].pageY; });
-        window.addEventListener('touchmove', e => {
-            if (window.scrollY === 0 && e.touches[0].pageY > startY + 60) {
-                document.getElementById('refresh').style.height = '40px';
-            }
+        filtered.slice().reverse().forEach(ad => {
+            list.innerHTML += `
+                <div class="ad-card">
+                    <h3>${ad.subject}</h3>
+                    <p><strong>Imię:</strong> ${ad.name} (${ad.age} lat)</p>
+                    <p>${ad.desc}</p>
+                    <p class="price">Cena: ${ad.price}</p>
+                    <div class="contact">Kontakt: ${ad.contact}</div>
+                </div>
+            `;
         });
-        window.addEventListener('touchend', () => {
-            setTimeout(() => {
-                document.getElementById('refresh').style.height = '0';
-                render();
-            }, 600);
-        });
+    }
 
-        render();
-    </script>
+    renderAds();
+</script>
+
 </body>
 </html>
