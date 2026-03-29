@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mój Portfel Vinted</title>
+    <title>Portfel Vinted</title>
     <link rel="manifest" href="manifest.json">
     <style>
         :root {
             --bg: #000000;
-            --card: #121212;
             --text: #ffffff;
             --sec: #999999;
             --acc: #008080;
@@ -24,57 +23,48 @@
             overscroll-behavior-y: contain;
         }
 
-        .header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--bg); z-index: 100; }
-        
-        /* Klikalne oczekujące środki */
-        .pending { color: var(--sec); font-size: 14px; display: flex; justify-content: space-between; padding: 10px 20px; cursor: pointer; transition: background 0.2s; }
-        .pending:active { background: #111; }
+        /* Górna belka i Oczekujące */
+        .header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .pending { color: var(--sec); font-size: 14px; display: flex; justify-content: space-between; padding: 10px 20px; cursor: pointer; }
 
-        .balance-box { text-align: center; padding: 30px 0; cursor: pointer; transition: opacity 0.2s; }
-        .balance-box:active { opacity: 0.6; }
-        
+        /* Główna Kwota - KLIKALNA */
+        .balance-box { text-align: center; padding: 30px 0; cursor: pointer; }
         .amount { font-size: 44px; font-weight: bold; margin: 5px 0; }
         .label { color: var(--sec); font-size: 13px; }
 
-        .actions { display: flex; justify-content: center; gap: 40px; margin: 20px 0; }
+        .actions { display: flex; justify-content: center; gap: 40px; margin: 20px 0; opacity: 0.8; }
         .act { display: flex; flex-direction: column; align-items: center; font-size: 12px; }
         .icon { width: 55px; height: 55px; background: #222; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; font-size: 22px; }
 
+        /* Historia */
         .history { padding: 0 20px; border-top: 8px solid #080808; min-height: 400px; }
         .month { color: var(--sec); font-size: 13px; padding: 20px 0 10px 0; }
-
         .item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 0.5px solid var(--border); }
-        .item-info b { display: block; font-size: 15px; margin-bottom: 2px; }
+        .item-info b { display: block; font-size: 15px; }
         .item-info small { color: var(--sec); font-size: 12px; }
         .item-price { font-weight: bold; font-size: 15px; }
         .neg { color: var(--err); }
 
-        /* PANELE WPISYWANIA */
+        /* PANELE WPISYWANIA - UKRYTE DOMYŚLNIE */
         .input-area { 
             background: #111; padding: 25px 15px; border-top: 1px solid #333; 
             position: fixed; bottom: 0; width: 100%; box-sizing: border-box; 
-            display: none; z-index: 200;
-            box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+            display: none; z-index: 1000;
         }
 
         input { background: #222; border: 1px solid #333; color: #fff; padding: 15px; width: 100%; border-radius: 8px; box-sizing: border-box; margin-bottom: 15px; font-size: 18px; }
         .btns { display: flex; gap: 10px; }
-        button { flex: 1; padding: 15px; border-radius: 5px; border: none; color: #fff; font-weight: bold; font-size: 14px; cursor: pointer; }
-        
-        .close-btn { color: var(--sec); text-align: center; font-size: 12px; margin-top: 15px; text-transform: uppercase; letter-spacing: 1px; }
-
-        #ptr { text-align: center; height: 0; overflow: hidden; color: var(--acc); font-size: 12px; line-height: 40px; }
+        button { flex: 1; padding: 15px; border-radius: 5px; border: none; color: #fff; font-weight: bold; cursor: pointer; }
+        .close-btn { color: var(--sec); text-align: center; font-size: 12px; margin-top: 15px; }
     </style>
 </head>
 <body>
-
-    <div id="ptr">Odświeżanie...</div>
 
     <div class="header"><span>←</span><strong>Mój Portfel Vinted</strong><span>⚙️</span></div>
     
     <div class="pending" onclick="openPanel('pending')">
         <span>Oczekujące środki</span>
-        <span id="pending-display">0,00 zł ⓘ</span>
+        <span id="p-display">0,00 zł ⓘ</span>
     </div>
 
     <div class="balance-box" onclick="openPanel('available')">
@@ -94,22 +84,18 @@
     </div>
 
     <div id="panel-available" class="input-area">
-        <h3 style="margin-top:0; font-size:16px;">Dodaj do Dostępnych</h3>
-        <input type="number" id="val-available" placeholder="Kwota zł" inputmode="decimal">
+        <input type="number" id="val-available" placeholder="Wpisz kwotę (np. 130)" inputmode="decimal">
         <div class="btns">
-            <button onclick="add('available', 'in')" style="background: #008080;">DODAJ SPRZEDAŻ</button>
+            <button onclick="add('available', 'in')" style="background: #008080;">DODAJ</button>
             <button onclick="add('available', 'out')" style="background: #333;">WYPŁAĆ</button>
         </div>
-        <div class="close-btn" onclick="closePanels()">Anuluj</div>
+        <div class="close-btn" onclick="closeAll()">ANULUJ</div>
     </div>
 
     <div id="panel-pending" class="input-area">
-        <h3 style="margin-top:0; font-size:16px;">Ustaw Oczekujące</h3>
-        <input type="number" id="val-pending" placeholder="Kwota zł" inputmode="decimal">
-        <div class="btns">
-            <button onclick="add('pending', 'set')" style="background: #008080; width: 100%;">ZAPISZ OCZEKUJĄCE</button>
-        </div>
-        <div class="close-btn" onclick="closePanels()">Anuluj</div>
+        <input type="number" id="val-pending" placeholder="Kwota oczekująca" inputmode="decimal">
+        <button onclick="add('pending', 'set')" style="background: #008080; width: 100%;">USTAW OCZEKUJĄCE</button>
+        <div class="close-btn" onclick="closeAll()">ANULUJ</div>
     </div>
 
     <script>
@@ -117,70 +103,41 @@
         let p = parseFloat(localStorage.getItem('v_p')) || 0;
         let h = JSON.parse(localStorage.getItem('v_h')) || [];
 
-        function openPanel(type) {
-            closePanels();
-            document.getElementById('panel-' + type).style.display = 'block';
-            document.getElementById('val-' + type).focus();
+        function openPanel(t) {
+            closeAll();
+            document.getElementById('panel-' + t).style.display = 'block';
+            document.getElementById('val-' + t).focus();
         }
 
-        function closePanels() {
+        function closeAll() {
             document.getElementById('panel-available').style.display = 'none';
             document.getElementById('panel-pending').style.display = 'none';
         }
 
         function render() {
             document.getElementById('total').innerText = b.toFixed(2).replace('.', ',') + ' zł';
-            document.getElementById('pending-display').innerText = p.toFixed(2).replace('.', ',') + ' zł ⓘ';
-            
+            document.getElementById('p-display').innerText = p.toFixed(2).replace('.', ',') + ' zł ⓘ';
             const list = document.getElementById('list');
             list.innerHTML = '';
             h.slice().reverse().forEach(i => {
-                list.innerHTML += `
-                    <div class="item">
-                        <div class="item-info"><b>${i.t}</b><small>${i.d}</small></div>
-                        <div class="item-price ${i.ty==='out'?'neg':''}">
-                            ${i.ty==='out'?'-':''}${i.a.toFixed(2).replace('.',',')} zł >
-                        </div>
-                    </div>`;
+                list.innerHTML += `<div class="item"><div class="item-info"><b>${i.t}</b><small>${i.d}</small></div><div class="item-price ${i.ty==='out'?'neg':''}">${i.ty==='out'?'-':''}${i.a.toFixed(2).replace('.',',')} zł ></div></div>`;
             });
-            localStorage.setItem('v_b', b);
-            localStorage.setItem('v_p', p);
-            localStorage.setItem('v_h', JSON.stringify(h));
+            localStorage.setItem('v_b', b); localStorage.setItem('v_p', p); localStorage.setItem('v_h', JSON.stringify(h));
         }
 
         function add(target, type) {
-            const input = document.getElementById('val-' + target);
-            const v = parseFloat(input.value);
-            if(isNaN(v)) return;
-
+            const val = parseFloat(document.getElementById('val-' + target).value);
+            if(isNaN(val)) return;
             const d = new Date().getDate() + " mar 2026";
-
             if(target === 'available') {
-                if(type==='in') { b += v; h.push({t:'Sprzedane', a:v, ty:'in', d:d}); }
-                else { b -= v; h.push({t:'Wypłata na konto', a:v, ty:'out', d:d}); }
-            } else {
-                p = v; // Ustawia nową kwotę oczekującą
-            }
-
-            input.value = '';
-            closePanels();
-            render();
+                if(type==='in') { b += val; h.push({t:'Sprzedane', a:val, ty:'in', d:d}); }
+                else { b -= val; h.push({t:'Wypłata na konto', a:val, ty:'out', d:d}); }
+            } else { p = val; }
+            document.getElementById('val-' + target).value = '';
+            closeAll(); render();
         }
 
         render();
-        // Pull to refresh logic...
-        let startY = 0;
-        window.addEventListener('touchstart', e => startY = e.touches[0].pageY);
-        window.addEventListener('touchmove', e => {
-            if(window.scrollY === 0 && e.touches[0].pageY > startY + 60) {
-                document.getElementById('ptr').style.height = '40px';
-            }
-        });
-        window.addEventListener('touchend', () => {
-            setTimeout(() => { document.getElementById('ptr').style.height = '0'; render(); }, 600);
-        });
-
-        if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
     </script>
 </body>
 </html>
