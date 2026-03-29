@@ -8,10 +8,9 @@
     <style>
         :root {
             --bg: #000000;
-            --card: #121212;
             --text: #ffffff;
             --sec: #999999;
-            --acc: #008080;
+            --acc: #00c2c2;
             --err: #ff5c5c;
             --border: #222222;
         }
@@ -23,27 +22,79 @@
             margin: 0;
             padding: 0;
             overscroll-behavior-y: contain;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--bg); z-index: 10; }
-        .pending { color: var(--sec); font-size: 13px; display: flex; justify-content: space-between; padding: 10px 20px; }
-        .balance-box { text-align: center; padding: 20px 0; }
-        .amount { font-size: 44px; font-weight: 700; margin-bottom: 5px; }
+        /* Nagłówek */
+        .header {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: var(--bg);
+            z-index: 10;
+        }
+        .header span { font-size: 20px; }
+
+        /* Oczekujące środki */
+        .pending {
+            color: var(--sec);
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 20px;
+            margin-top: 5px;
+        }
+
+        /* Sekcja Salda - KLIKALNA */
+        .balance-box {
+            text-align: center;
+            padding: 30px 0;
+            cursor: pointer;
+        }
+        .amount { font-size: 48px; font-weight: 700; margin-bottom: 5px; }
         .label { color: var(--sec); font-size: 14px; }
 
-        .actions { display: flex; justify-content: center; gap: 40px; margin: 25px 0; }
-        .act { display: flex; flex-direction: column; align-items: center; font-size: 12px; color: var(--text); }
-        .icon { width: 50px; height: 50px; background: #1a1a1a; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; font-size: 20px; border: 1px solid #333; }
+        /* Przyciski Akcji */
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 45px;
+            margin: 20px 0 40px 0;
+        }
+        .act { display: flex; flex-direction: column; align-items: center; font-size: 13px; color: var(--text); }
+        .icon {
+            width: 55px; height: 55px;
+            background: #1a1a1a;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 8px; font-size: 22px;
+            border: 1px solid #333;
+        }
 
-        .history { background: var(--bg); padding: 20px; border-top: 1px solid var(--border); margin-bottom: 150px; }
-        .month { color: var(--sec); font-size: 14px; margin-bottom: 15px; text-transform: lowercase; }
-        .item { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 0.5px solid var(--border); }
-        .item-info b { display: block; font-size: 15px; margin-bottom: 3px; }
-        .item-info small { color: var(--sec); font-size: 12px; }
-        .item-price { font-weight: 600; font-size: 15px; }
+        /* Historia Transakcji */
+        .history {
+            background: var(--bg);
+            padding: 0 20px 120px 20px;
+            border-top: 1px solid var(--border);
+        }
+        .month { color: var(--sec); font-size: 14px; margin: 25px 0 15px 0; }
+        .item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 0;
+            border-bottom: 0.5px solid var(--border);
+        }
+        .item-info b { display: block; font-size: 16px; margin-bottom: 4px; font-weight: 500; }
+        .item-info small { color: var(--sec); font-size: 13px; }
+        .item-price { font-weight: 600; font-size: 16px; display: flex; align-items: center; }
+        .item-price span { color: #555; margin-left: 10px; font-size: 18px; font-weight: normal; }
         .neg { color: var(--err); }
 
-        /* DOLNY PASEK NAWIGACJI */
+        /* Dolny pasek */
         .navbar {
             position: fixed;
             bottom: 0;
@@ -51,36 +102,22 @@
             background: #000;
             display: flex;
             justify-content: space-around;
-            padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
+            padding: 10px 0 calc(12px + env(safe-area-inset-bottom));
             border-top: 1px solid #222;
-            z-index: 20;
+            z-index: 100;
         }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--sec); font-size: 10px; text-decoration: none; }
-        .nav-item.active { color: #00c2c2; }
-        .nav-icon { font-size: 22px; margin-bottom: 4px; position: relative; }
-        .badge { position: absolute; top: -2px; right: -5px; background: #ff5c5c; width: 8px; height: 8px; border-radius: 50%; border: 2px solid #000; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--sec); font-size: 11px; text-decoration: none; width: 20%; }
+        .nav-item.active { color: var(--acc); }
+        .nav-icon { font-size: 24px; margin-bottom: 4px; position: relative; }
+        .badge { position: absolute; top: -1px; right: -3px; background: var(--err); width: 9px; height: 9px; border-radius: 50%; border: 2px solid #000; }
 
-        /* PANEL WPISYWANIA - nad navbar */
-        .input-panel {
-            background: #1a1a1a;
-            padding: 10px 20px;
-            border-top: 1px solid #333;
-            position: fixed;
-            bottom: 65px; /* Wysokość navbara */
-            width: 100%;
-            box-sizing: border-box;
-            z-index: 15;
-        }
-        input { background: #333; border: none; color: #fff; padding: 10px; border-radius: 6px; width: 100%; margin-bottom: 8px; font-size: 14px; box-sizing: border-box; }
-        .btns { display: flex; gap: 10px; }
-        button { flex: 1; padding: 10px; border: none; border-radius: 4px; color: #fff; font-weight: bold; font-size: 12px; }
-
-        #refresh-icon { text-align: center; height: 0; overflow: hidden; transition: height 0.3s; color: var(--acc); font-size: 12px; }
+        /* Animacja odświeżania */
+        #refresh { text-align: center; height: 0; overflow: hidden; transition: 0.3s; color: var(--acc); font-size: 13px; line-height: 40px; }
     </style>
 </head>
 <body>
 
-    <div id="refresh-icon">Odświeżanie...</div>
+    <div id="refresh">Odświeżanie...</div>
 
     <div class="header">
         <span>←</span>
@@ -93,7 +130,7 @@
         <span>0,00 zł ⓘ</span>
     </div>
 
-    <div class="balance-box">
+    <div class="balance-box" onclick="askAmount()">
         <div class="amount" id="total">0,00 zł</div>
         <div class="label">Dostępne środki</div>
     </div>
@@ -106,14 +143,16 @@
 
     <div class="history">
         <div class="month">marzec 2026</div>
-        <div id="list"></div>
-    </div>
-
-    <div class="input-panel">
-        <input type="number" id="val" placeholder="Kwota zł">
-        <div class="btns">
-            <button onclick="add('earn')" style="background: var(--acc)">+ ZYSK</button>
-            <button onclick="add('out')" style="background: var(--err)">- WYPŁATA</button>
+        <div id="list">
+            </div>
+        
+        <div class="month" style="margin-top: 40px;">Saldo początkowe</div>
+        <div class="item">
+            <div class="item-info">
+                <b>Saldo początkowe</b>
+                <small>1 mar 2026</small>
+            </div>
+            <div class="item-price">0,00 zł <span>&rsaquo;</span></div>
         </div>
     </div>
 
@@ -148,6 +187,7 @@
             document.getElementById('total').innerText = bal.toFixed(2).replace('.', ',') + ' zł';
             const list = document.getElementById('list');
             list.innerHTML = '';
+            
             hist.slice().reverse().forEach(i => {
                 const isNeg = i.ty === 'out';
                 list.innerHTML += `
@@ -157,7 +197,7 @@
                             <small>${i.d}</small>
                         </div>
                         <div class="item-price ${isNeg ? 'neg' : ''}">
-                            ${isNeg ? '-' : ''}${i.a.toFixed(2).replace('.', ',')} zł >
+                            ${isNeg ? '-' : ''}${i.a.toFixed(2).replace('.', ',')} zł <span>&rsaquo;</span>
                         </div>
                     </div>
                 `;
@@ -166,21 +206,38 @@
             localStorage.setItem('v_hist', JSON.stringify(hist));
         }
 
-        function add(type) {
-            const input = document.getElementById('val');
-            const v = parseFloat(input.value);
-            if(!v) return;
+        function askAmount() {
+            const mode = confirm("Kliknij OK, aby dodać SPRZEDAŻ.\nKliknij ANULUJ, aby dodać WYPŁATĘ.");
+            const val = prompt("Wpisz kwotę (np. 130):");
+            const num = parseFloat(val);
+            
+            if(!num || num <= 0) return;
+
             const d = new Date().getDate() + ' mar 2026';
-            if(type === 'earn') {
-                bal += v;
-                hist.push({t: 'Sprzedane', a: v, ty: 'in', d: d});
+            if(mode) {
+                bal += num;
+                hist.push({t: 'Sprzedane', a: num, ty: 'in', d: d});
             } else {
-                bal -= v;
-                hist.push({t: 'Wypłata na konto bankowe', a: v, ty: 'out', d: d});
+                bal -= num;
+                hist.push({t: 'Wypłata na konto bankowe', a: num, ty: 'out', d: d});
             }
-            input.value = '';
             render();
         }
+
+        // Pull to refresh logic
+        let startY = 0;
+        window.addEventListener('touchstart', e => { startY = e.touches[0].pageY; });
+        window.addEventListener('touchmove', e => {
+            if (window.scrollY === 0 && e.touches[0].pageY > startY + 60) {
+                document.getElementById('refresh').style.height = '40px';
+            }
+        });
+        window.addEventListener('touchend', () => {
+            setTimeout(() => {
+                document.getElementById('refresh').style.height = '0';
+                render();
+            }, 600);
+        });
 
         render();
     </script>
