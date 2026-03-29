@@ -16,6 +16,7 @@
             --text: #f0f6fc;
             --sec: #8b949e;
             --border: #30363d;
+            --danger: #da3633;
         }
 
         body {
@@ -23,7 +24,7 @@
             background-color: var(--bg);
             color: var(--text);
             margin: 0;
-            padding-bottom: 90px;
+            padding-bottom: 100px; /* Miejsce na większy pasek */
         }
 
         header {
@@ -60,16 +61,33 @@
         .btn-main {
             width: 100%; padding: 14px; border: none; border-radius: 12px;
             background: var(--primary); color: white; font-weight: 800;
-            cursor: pointer; margin-top: 10px;
+            cursor: pointer; margin-top: 10px; font-size: 15px;
         }
 
+        /* --- POWIĘKSZONY PASEK DOLNY --- */
         .navbar {
             position: fixed; bottom: 0; width: 100%; background: #161b22;
             display: flex; border-top: 1px solid var(--border);
-            padding-bottom: env(safe-area-inset-bottom);
+            padding: 12px 0;
+            padding-bottom: calc(12px + env(safe-area-inset-bottom));
+            z-index: 1000;
         }
-        .nav-item { flex: 1; text-align: center; padding: 15px 0; color: var(--sec); font-size: 10px; cursor: pointer; }
-        .nav-item.active { color: var(--primary); }
+        .nav-item { 
+            flex: 1; text-align: center; color: var(--sec); 
+            font-size: 13px; cursor: pointer; position: relative;
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+        }
+        .nav-item.active { color: var(--primary); font-weight: bold; }
+        
+        .nav-icon { font-size: 22px; }
+
+        /* Kropka powiadomienia */
+        #chat-dot {
+            position: absolute; top: 0; right: 25%;
+            width: 10px; height: 10px; background: var(--danger);
+            border-radius: 50%; border: 2px solid #161b22;
+            display: none;
+        }
 
         .page { display: none; }
         .page.active { display: block; }
@@ -82,7 +100,7 @@
 
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 1000;
+            background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 1500;
         }
         .modal { background: var(--card); width: 85%; padding: 20px; border-radius: 20px; text-align: center; }
     </style>
@@ -102,7 +120,7 @@
 <div id="messages" class="page">
     <div class="container">
         <h2 style="color: var(--primary)">Twoje Rozmowy</h2>
-        <div id="msgsContainer">Zaloguj się w zakładce Profil, aby odbierać wiadomości.</div>
+        <div id="msgsContainer">Zaloguj się w zakładce Profil.</div>
     </div>
 </div>
 
@@ -119,7 +137,6 @@
 <div id="profile" class="page">
     <div class="container" id="profileContent">
         <h2>Twój Profil</h2>
-        <p style="font-size: 14px; color: var(--sec);">Wprowadź dane, aby system wiedział komu wysyłać wiadomości.</p>
         <input type="text" id="userName" placeholder="Twój Nick">
         <input type="email" id="userEmail" placeholder="Twój E-mail">
         <button class="btn-main" onclick="saveUser()">Zapisz Profil</button>
@@ -136,14 +153,22 @@
 </div>
 
 <nav class="navbar">
-    <div class="nav-item active" onclick="nav('home', this)">🏠 Eksploruj</div>
-    <div class="nav-item" onclick="nav('messages', this)">💬 Czaty</div>
-    <div class="nav-item" onclick="nav('add', this)">➕ Dodaj</div>
-    <div class="nav-item" onclick="nav('profile', this)">⚙️ Profil</div>
+    <div class="nav-item active" onclick="nav('home', this)">
+        <span class="nav-icon">🏠</span> Eksploruj
+    </div>
+    <div class="nav-item" onclick="nav('messages', this)">
+        <div id="chat-dot"></div>
+        <span class="nav-icon">💬</span> Czaty
+    </div>
+    <div class="nav-item" onclick="nav('add', this)">
+        <span class="nav-icon">➕</span> Dodaj
+    </div>
+    <div class="nav-item" onclick="nav('profile', this)">
+        <span class="nav-icon">⚙️</span> Profil
+    </div>
 </nav>
 
 <script>
-    // --- TWOJA PEŁNA KONFIGURACJA Z LINKIEM BELGIA ---
     const firebaseConfig = {
         apiKey: "AIzaSyAbs_Z_Oqy2FrWP3CuGK9w9qjDMYGDhgck",
         authDomain: "educore-5c9f4.firebaseapp.com",
@@ -156,6 +181,7 @@
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
+    const adminEmail = "milosz.marciniak9999@gmail.com";
 
     let user = JSON.parse(localStorage.getItem('edu_user'));
     let activeTarget = null;
@@ -165,8 +191,12 @@
         document.getElementById(id).classList.add('active');
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         el.classList.add('active');
+        
         if(id === 'home') renderAds();
-        if(id === 'messages') renderMsgs();
+        if(id === 'messages') {
+            renderMsgs();
+            document.getElementById('chat-dot').style.display = 'none';
+        }
         if(id === 'profile') renderProfile();
     }
 
@@ -184,75 +214,68 @@
             localStorage.setItem('edu_user', JSON.stringify(user));
             showToast("Profil zapisany!");
             renderProfile();
-        } else {
-            showToast("Wypełnij oba pola!");
         }
     }
 
     function renderProfile() {
         if(user) {
             document.getElementById('profileContent').innerHTML = `
-                <div style="text-align:center">
-                    <h2>Witaj, ${user.name}!</h2>
-                    <p style="color:var(--sec)">Twoje konto: ${user.email}</p>
-                    <button class="btn-main" style="background: #da3633" onclick="localStorage.clear(); location.reload();">Wyloguj i usuń dane</button>
+                <div style="text-align:center; padding: 20px;">
+                    <h2 style="color: var(--primary)">${user.name}</h2>
+                    <p style="color:var(--sec)">${user.email}</p>
+                    <button class="btn-main" style="background: var(--danger); margin-top: 40px;" 
+                        onclick="localStorage.clear(); location.reload();">🔴 Wyloguj się</button>
                 </div>`;
         }
     }
 
     function postAd() {
-        if(!user) return showToast("Zaloguj się najpierw w Profilu!");
+        if(!user) return showToast("Zaloguj się w Profilu!");
         const sub = document.getElementById('addSub').value;
         const price = document.getElementById('addPrice').value;
         const desc = document.getElementById('addDesc').value;
+        if(!sub || !price) return;
 
-        if(!sub || !price) return showToast("Podaj chociaż przedmiot i cenę!");
-
-        const ad = {
-            sub: sub,
-            price: price,
-            desc: desc,
-            owner: user.name,
-            email: user.email,
-            time: Date.now()
-        };
-
-        db.ref('ads').push(ad).then(() => {
-            showToast("Dodano ogłoszenie!");
-            document.getElementById('addSub').value = '';
-            document.getElementById('addPrice').value = '';
-            document.getElementById('addDesc').value = '';
+        db.ref('ads').push({
+            sub, price, desc, owner: user.name, email: user.email, time: Date.now()
+        }).then(() => {
+            showToast("Dodano!");
             nav('home', document.querySelector('.nav-item'));
         });
+    }
+
+    function deleteAd(key) {
+        if(confirm("Usunąć to ogłoszenie?")) {
+            db.ref('ads').child(key).remove().then(() => showToast("Usunięto!"));
+        }
     }
 
     function renderAds() {
         db.ref('ads').on('value', (snap) => {
             const container = document.getElementById('adsContainer');
-            if(!snap.exists()) {
-                container.innerHTML = "Brak ogłoszeń. Dodaj pierwsze!";
-                return;
-            }
             container.innerHTML = '';
             snap.forEach(child => {
                 const a = child.val();
+                const key = child.key;
+                const canDelete = user && (user.email === a.email || user.email === adminEmail);
+                
                 container.innerHTML += `
                     <div class="ad-card">
-                        <small style="color:var(--primary)">Dodane przez: @${a.owner}</small>
+                        <small style="color:var(--primary)">@${a.owner}</small>
                         <h3 style="margin:5px 0">${a.sub}</h3>
                         <p style="font-size:14px; color:var(--sec)">${a.desc}</p>
                         <div class="price-tag">${a.price}</div>
-                        <button class="btn-main" onclick="openModal('${a.owner}', '${a.email}')">📩 Wyślij wiadomość</button>
+                        <button class="btn-main" onclick="openModal('${a.owner}', '${a.email}')">📩 Napisz</button>
+                        ${canDelete ? `<button class="btn-main" style="background:var(--danger)" onclick="deleteAd('${key}')">🗑️ Usuń</button>` : ''}
                     </div>`;
             });
         });
     }
 
     function openModal(name, email) {
-        if(!user) return showToast("Zaloguj się w Profilu!");
-        if(user.email === email) return showToast("To Twoje ogłoszenie!");
+        if(!user) return showToast("Zaloguj się!");
+        if(user.email === email) return;
         activeTarget = {name, email};
-        document.getElementById('modalTitle').innerText = "Napisz do: " + name;
         document.getElementById('msgModal').style.display = 'flex';
     }
 
@@ -262,14 +285,10 @@
         const txt = document.getElementById('modalInput').value;
         if(!txt) return;
         db.ref('messages').push({
-            to: activeTarget.email,
-            from: user.name,
-            fromEmail: user.email,
-            text: txt,
-            date: new Date().toLocaleString()
+            to: activeTarget.email, from: user.name, fromEmail: user.email,
+            text: txt, date: new Date().toLocaleString(), read: false
         }).then(() => {
-            showToast("Wysłano wiadomość!");
-            document.getElementById('modalInput').value = '';
+            showToast("Wysłano!");
             closeModal();
         });
     }
@@ -279,27 +298,34 @@
         db.ref('messages').on('value', (snap) => {
             const container = document.getElementById('msgsContainer');
             container.innerHTML = '';
-            let count = 0;
             snap.forEach(child => {
                 const m = child.val();
                 if(m.to === user.email) {
-                    count++;
                     container.innerHTML += `
                         <div class="ad-card" style="border-left: 4px solid var(--primary)">
                             <small>Od: <b>${m.from}</b> (${m.date})</small>
                             <p>${m.text}</p>
-                            <button class="btn-main" style="padding: 8px; font-size: 12px; background: #30363d" onclick="openModal('${m.from}', '${m.fromEmail}')">Odpisz</button>
+                            <button class="btn-main" style="padding: 8px; font-size: 12px; background: #30363d" 
+                                onclick="openModal('${m.from}', '${m.fromEmail}')">Odpisz</button>
                         </div>`;
                 }
             });
-            if(count === 0) container.innerHTML = "Brak nowych wiadomości.";
         });
     }
 
-    // Start aplikacji
+    // Nasłuchiwanie nowych wiadomości dla kropki
+    if(user) {
+        db.ref('messages').on('child_added', (snap) => {
+            const m = snap.val();
+            const activePage = document.querySelector('.page.active').id;
+            if(m.to === user.email && activePage !== 'messages') {
+                document.getElementById('chat-dot').style.display = 'block';
+            }
+        });
+    }
+
     renderAds();
     if(user) renderProfile();
 </script>
-
 </body>
 </html>
