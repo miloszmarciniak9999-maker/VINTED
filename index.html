@@ -22,13 +22,15 @@
             color: var(--text);
             margin: 0; padding: 0;
             overscroll-behavior-y: contain;
-            user-select: none;
         }
 
         .header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--bg); z-index: 100; }
         .pending { color: var(--sec); font-size: 14px; display: flex; justify-content: space-between; padding: 10px 20px; }
 
-        .balance-box { text-align: center; padding: 30px 0; }
+        /* Klikalna kwota */
+        .balance-box { text-align: center; padding: 30px 0; cursor: pointer; transition: opacity 0.2s; }
+        .balance-box:active { opacity: 0.6; }
+        
         .amount { font-size: 44px; font-weight: bold; margin: 5px 0; }
         .label { color: var(--sec); font-size: 13px; }
 
@@ -45,11 +47,20 @@
         .item-price { font-weight: bold; font-size: 15px; }
         .neg { color: var(--err); }
 
-        /* Panel dolny do wpisywania */
-        .input-area { background: #111; padding: 15px; border-top: 1px solid #333; position: fixed; bottom: 0; width: 100%; box-sizing: border-box; }
-        input { background: #222; border: 1px solid #333; color: #fff; padding: 12px; width: 100%; border-radius: 5px; box-sizing: border-box; margin-bottom: 10px; font-size: 16px; }
+        /* UKRYTY PANEL WPISYWANIA */
+        #input-area { 
+            background: #111; padding: 25px 15px; border-top: 1px solid #333; 
+            position: fixed; bottom: 0; width: 100%; box-sizing: border-box; 
+            display: none; /* Ukryty na start */
+            z-index: 200;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+        }
+
+        input { background: #222; border: 1px solid #333; color: #fff; padding: 15px; width: 100%; border-radius: 8px; box-sizing: border-box; margin-bottom: 15px; font-size: 18px; }
         .btns { display: flex; gap: 10px; }
-        button { flex: 1; padding: 12px; border-radius: 5px; border: none; color: #fff; font-weight: bold; }
+        button { flex: 1; padding: 15px; border-radius: 5px; border: none; color: #fff; font-weight: bold; font-size: 14px; }
+        
+        .close-btn { color: var(--sec); text-align: center; font-size: 12px; margin-top: 15px; text-transform: uppercase; letter-spacing: 1px; }
 
         #ptr { text-align: center; height: 0; overflow: hidden; color: var(--acc); font-size: 12px; line-height: 40px; }
     </style>
@@ -62,7 +73,7 @@
     
     <div class="pending"><span>Oczekujące środki</span><span>0,00 zł ⓘ</span></div>
 
-    <div class="balance-box">
+    <div class="balance-box" onclick="togglePanel(true)">
         <div class="amount" id="total">0,00 zł</div>
         <div class="label">Dostępne środki</div>
     </div>
@@ -82,19 +93,25 @@
         </div>
     </div>
 
-    <div style="height: 150px;"></div>
+    <div style="height: 100px;"></div>
 
-    <div class="input-area">
-        <input type="number" id="val" placeholder="Wpisz kwotę zł (np. 130)">
+    <div id="input-area">
+        <input type="number" id="val" placeholder="Wpisz kwotę zł" inputmode="decimal">
         <div class="btns">
-            <button onclick="add('in')" style="background: #008080;">DODAJ</button>
+            <button onclick="add('in')" style="background: #008080;">DODAJ SPRZEDAŻ</button>
             <button onclick="add('out')" style="background: #333;">WYPŁAĆ</button>
         </div>
+        <div class="close-btn" onclick="togglePanel(false)">Anuluj</div>
     </div>
 
     <script>
         let b = parseFloat(localStorage.getItem('v_b')) || 0;
         let h = JSON.parse(localStorage.getItem('v_h')) || [];
+
+        function togglePanel(show) {
+            document.getElementById('input-area').style.display = show ? 'block' : 'none';
+            if(show) document.getElementById('val').focus();
+        }
 
         function render() {
             document.getElementById('total').innerText = b.toFixed(2).replace('.', ',') + ' zł';
@@ -120,6 +137,7 @@
             if(type==='in') { b += v; h.push({t:'Sprzedane', a:v, ty:'in', d:d}); }
             else { b -= v; h.push({t:'Wypłata na konto', a:v, ty:'out', d:d}); }
             document.getElementById('val').value = '';
+            togglePanel(false);
             render();
         }
 
