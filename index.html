@@ -1,4 +1,100 @@
-<div class="amount" id="total">0,00 zł</div>
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Mój Portfel Vinted</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        :root {
+            --bg: #000000;
+            --card: #121212;
+            --text: #ffffff;
+            --sec: #999999;
+            --acc: #008080;
+            --err: #ff5c5c;
+            --border: #222222;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            overscroll-behavior-y: contain;
+        }
+
+        .header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--bg); z-index: 10; }
+        .pending { color: var(--sec); font-size: 13px; display: flex; justify-content: space-between; padding: 10px 20px; }
+        .balance-box { text-align: center; padding: 20px 0; }
+        .amount { font-size: 44px; font-weight: 700; margin-bottom: 5px; }
+        .label { color: var(--sec); font-size: 14px; }
+
+        .actions { display: flex; justify-content: center; gap: 40px; margin: 25px 0; }
+        .act { display: flex; flex-direction: column; align-items: center; font-size: 12px; color: var(--text); }
+        .icon { width: 50px; height: 50px; background: #1a1a1a; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; font-size: 20px; border: 1px solid #333; }
+
+        .history { background: var(--bg); padding: 20px; border-top: 1px solid var(--border); margin-bottom: 150px; }
+        .month { color: var(--sec); font-size: 14px; margin-bottom: 15px; text-transform: lowercase; }
+        .item { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 0.5px solid var(--border); }
+        .item-info b { display: block; font-size: 15px; margin-bottom: 3px; }
+        .item-info small { color: var(--sec); font-size: 12px; }
+        .item-price { font-weight: 600; font-size: 15px; }
+        .neg { color: var(--err); }
+
+        /* DOLNY PASEK NAWIGACJI */
+        .navbar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: #000;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
+            border-top: 1px solid #222;
+            z-index: 20;
+        }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--sec); font-size: 10px; text-decoration: none; }
+        .nav-item.active { color: #00c2c2; }
+        .nav-icon { font-size: 22px; margin-bottom: 4px; position: relative; }
+        .badge { position: absolute; top: -2px; right: -5px; background: #ff5c5c; width: 8px; height: 8px; border-radius: 50%; border: 2px solid #000; }
+
+        /* PANEL WPISYWANIA - nad navbar */
+        .input-panel {
+            background: #1a1a1a;
+            padding: 10px 20px;
+            border-top: 1px solid #333;
+            position: fixed;
+            bottom: 65px; /* Wysokość navbara */
+            width: 100%;
+            box-sizing: border-box;
+            z-index: 15;
+        }
+        input { background: #333; border: none; color: #fff; padding: 10px; border-radius: 6px; width: 100%; margin-bottom: 8px; font-size: 14px; box-sizing: border-box; }
+        .btns { display: flex; gap: 10px; }
+        button { flex: 1; padding: 10px; border: none; border-radius: 4px; color: #fff; font-weight: bold; font-size: 12px; }
+
+        #refresh-icon { text-align: center; height: 0; overflow: hidden; transition: height 0.3s; color: var(--acc); font-size: 12px; }
+    </style>
+</head>
+<body>
+
+    <div id="refresh-icon">Odświeżanie...</div>
+
+    <div class="header">
+        <span>←</span>
+        <strong>Mój Portfel Vinted</strong>
+        <span>⚙️</span>
+    </div>
+
+    <div class="pending">
+        <span>Oczekujące środki</span>
+        <span>0,00 zł ⓘ</span>
+    </div>
+
+    <div class="balance-box">
+        <div class="amount" id="total">0,00 zł</div>
         <div class="label">Dostępne środki</div>
     </div>
 
@@ -9,18 +105,40 @@
     </div>
 
     <div class="history">
-        <div class="month" id="current-month">marzec 2026</div>
-        <div id="list">
-            </div>
+        <div class="month">marzec 2026</div>
+        <div id="list"></div>
     </div>
 
-    <div style="height: 180px;"></div> <div class="input-panel">
-        <input type="number" id="val" placeholder="Wpisz kwotę (np. 130)" step="0.01">
+    <div class="input-panel">
+        <input type="number" id="val" placeholder="Kwota zł">
         <div class="btns">
-            <button onclick="add('earn')" style="background: var(--acc)">DODAJ SPRZEDAŻ</button>
-            <button onclick="add('out')" style="background: var(--err)">WYPŁAĆ</button>
+            <button onclick="add('earn')" style="background: var(--acc)">+ ZYSK</button>
+            <button onclick="add('out')" style="background: var(--err)">- WYPŁATA</button>
         </div>
     </div>
+
+    <nav class="navbar">
+        <div class="nav-item">
+            <div class="nav-icon">🏠</div>
+            Nowości
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">🔍</div>
+            Szukaj
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">➕</div>
+            Sprzedaj
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">✉️<div class="badge"></div></div>
+            Wiadomości
+        </div>
+        <div class="nav-item active">
+            <div class="nav-icon">👤</div>
+            Profil
+        </div>
+    </nav>
 
     <script>
         let bal = parseFloat(localStorage.getItem('v_bal')) || 0;
@@ -30,7 +148,6 @@
             document.getElementById('total').innerText = bal.toFixed(2).replace('.', ',') + ' zł';
             const list = document.getElementById('list');
             list.innerHTML = '';
-            
             hist.slice().reverse().forEach(i => {
                 const isNeg = i.ty === 'out';
                 list.innerHTML += `
@@ -40,8 +157,7 @@
                             <small>${i.d}</small>
                         </div>
                         <div class="item-price ${isNeg ? 'neg' : ''}">
-                            ${isNeg ? '-' : ''}${i.a.toFixed(2).replace('.', ',')} zł 
-                            <span style="color:#666; font-size:12px; margin-left:5px;">&gt;</span>
+                            ${isNeg ? '-' : ''}${i.a.toFixed(2).replace('.', ',')} zł >
                         </div>
                     </div>
                 `;
@@ -53,43 +169,20 @@
         function add(type) {
             const input = document.getElementById('val');
             const v = parseFloat(input.value);
-            if(!v || v <= 0) return;
-
-            const now = new Date();
-            const dateStr = now.getDate() + ' mar 2026';
-
+            if(!v) return;
+            const d = new Date().getDate() + ' mar 2026';
             if(type === 'earn') {
                 bal += v;
-                hist.push({t: 'Sprzedane', a: v, ty: 'in', d: dateStr});
+                hist.push({t: 'Sprzedane', a: v, ty: 'in', d: d});
             } else {
                 bal -= v;
-                hist.push({t: 'Wypłata na konto bankowe', a: v, ty: 'out', d: dateStr});
+                hist.push({t: 'Wypłata na konto bankowe', a: v, ty: 'out', d: d});
             }
             input.value = '';
             render();
         }
 
-        // Prosty Pull-to-refresh
-        let startY = 0;
-        window.addEventListener('touchstart', e => { startY = e.touches[0].pageY; });
-        window.addEventListener('touchmove', e => {
-            const y = e.touches[0].pageY;
-            if (window.scrollY === 0 && y > startY + 50) {
-                document.getElementById('refresh-icon').style.height = '40px';
-            }
-        });
-        window.addEventListener('touchend', () => {
-            setTimeout(() => {
-                document.getElementById('refresh-icon').style.height = '0';
-                render(); // "Odświeża" dane z pamięci
-            }, 500);
-        });
-
         render();
-
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
-        }
     </script>
 </body>
 </html>
