@@ -13,6 +13,7 @@
             --text: #f0f6fc;
             --sec: #8b949e;
             --border: #30363d;
+            --success: #2ecc71;
         }
 
         body {
@@ -24,7 +25,6 @@
             overflow-x: hidden;
         }
 
-        /* Header */
         header {
             padding: 20px;
             text-align: center;
@@ -35,272 +35,267 @@
             z-index: 100;
             border-bottom: 1px solid var(--border);
         }
-        header h1 { margin: 0; font-size: 20px; letter-spacing: 1px; color: var(--primary); }
+        header h1 { margin: 0; font-size: 20px; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; }
+
+        .container { padding: 15px; max-width: 500px; margin: 0 auto; }
 
         /* Tabs */
         .tabs { display: flex; padding: 10px; gap: 10px; background: var(--bg); }
         .tab {
-            flex: 1; padding: 12px; text-align: center; border-radius: 10px;
+            flex: 1; padding: 12px; text-align: center; border-radius: 12px;
             background: var(--card); color: var(--sec); cursor: pointer;
-            transition: 0.3s; font-weight: 600; font-size: 14px;
+            transition: 0.3s; font-weight: 600; font-size: 13px;
         }
         .tab.active { background: var(--primary); color: white; box-shadow: 0 0 15px var(--primary-glow); }
-
-        .container { padding: 15px; max-width: 500px; margin: 0 auto; }
 
         /* Ad Cards */
         .ad-card {
             background: var(--card); border-radius: 16px; padding: 20px;
             margin-bottom: 15px; border: 1px solid var(--border);
-            animation: fadeIn 0.5s ease;
+            animation: slideUp 0.4s ease-out;
         }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        .ad-card h3 { margin: 0 0 10px 0; font-size: 18px; }
-        .ad-card p { color: var(--sec); font-size: 14px; line-height: 1.5; }
         .price-tag { 
-            display: inline-block; padding: 5px 12px; background: rgba(0, 112, 243, 0.1); 
-            color: var(--primary); border-radius: 8px; font-weight: bold; margin-top: 10px;
+            display: inline-block; padding: 6px 14px; background: rgba(0, 112, 243, 0.1); 
+            color: var(--primary); border-radius: 10px; font-weight: 800; margin-top: 10px;
         }
 
-        .btn-msg {
-            width: 100%; margin-top: 15px; padding: 12px; border: none;
-            border-radius: 10px; background: var(--primary); color: white;
-            font-weight: bold; cursor: pointer; transition: 0.2s;
+        /* Nowoczesne Powiadomienie (Toast) */
+        #toast {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background: var(--primary); color: white; padding: 12px 25px;
+            border-radius: 50px; font-weight: bold; z-index: 2000;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            display: none; animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .btn-msg:active { transform: scale(0.98); }
+        @keyframes pop { from { top: -50px; opacity: 0; } to { top: 20px; opacity: 1; } }
 
-        /* Modal - Okienko na środku */
+        /* Modal Overlay */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); backdrop-filter: blur(4px);
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
             display: none; align-items: center; justify-content: center; z-index: 1000;
         }
         .modal {
-            background: var(--card); width: 85%; max-width: 350px;
-            padding: 25px; border-radius: 20px; border: 1px solid var(--border);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4); text-align: center;
+            background: var(--card); width: 90%; max-width: 400px;
+            padding: 25px; border-radius: 24px; border: 1px solid var(--border);
+            text-align: center;
         }
-        .modal h2 { margin-top: 0; font-size: 18px; color: var(--primary); }
-        .modal textarea {
-            width: 100%; height: 100px; background: #0d1117; border: 1px solid var(--border);
-            border-radius: 12px; color: white; padding: 12px; margin: 15px 0;
-            box-sizing: border-box; font-family: inherit; resize: none;
+        textarea {
+            width: 100%; height: 120px; background: #0d1117; border: 1px solid var(--border);
+            border-radius: 14px; color: white; padding: 15px; margin: 15px 0;
+            box-sizing: border-box; font-family: inherit; resize: none; outline: none;
         }
-        .modal-btns { display: flex; gap: 10px; }
-        .modal-btn { 
-            flex: 1; padding: 12px; border-radius: 10px; border: none; 
-            font-weight: bold; cursor: pointer; 
+        textarea:focus { border-color: var(--primary); }
+
+        .btn-main {
+            width: 100%; padding: 14px; border: none; border-radius: 12px;
+            background: var(--primary); color: white; font-weight: 800;
+            cursor: pointer; transition: 0.2s;
         }
-        .btn-send { background: var(--primary); color: white; }
-        .btn-cancel { background: #30363d; color: white; }
+        .btn-sec { background: #30363d; margin-top: 10px; }
+
+        /* Wiadomości - Chat Style */
+        .msg-bubble {
+            background: var(--card); padding: 18px; border-radius: 18px; 
+            margin-bottom: 12px; border: 1px solid var(--border);
+        }
+        .reply-btn {
+            background: transparent; color: var(--primary); border: 1px solid var(--primary);
+            padding: 6px 15px; border-radius: 8px; font-size: 11px; font-weight: bold;
+            float: right; cursor: pointer;
+        }
 
         /* Navbar */
         .navbar {
-            position: fixed; bottom: 0; width: 100%; background: rgba(22, 27, 34, 0.9);
-            backdrop-filter: blur(10px); display: flex; border-top: 1px solid var(--border);
+            position: fixed; bottom: 0; width: 100%; background: rgba(22, 27, 34, 0.95);
+            backdrop-filter: blur(15px); display: flex; border-top: 1px solid var(--border);
             padding-bottom: env(safe-area-inset-bottom);
         }
-        .nav-item { flex: 1; text-align: center; padding: 15px 0; color: var(--sec); cursor: pointer; font-size: 10px; }
+        .nav-item { flex: 1; text-align: center; padding: 15px 0; color: var(--sec); font-size: 10px; }
         .nav-item.active { color: var(--primary); }
-        .nav-icon { font-size: 20px; display: block; margin-bottom: 4px; }
+        .nav-icon { font-size: 22px; display: block; margin-bottom: 5px; }
 
-        /* Formularze */
         .page { display: none; }
         .page.active { display: block; }
+        
         input, select { 
-            width: 100%; padding: 14px; background: var(--card); border: 1px solid var(--border);
-            border-radius: 12px; color: white; margin-bottom: 15px; box-sizing: border-box;
-        }
-
-        /* Wiadomości */
-        .message-bubble {
-            background: var(--card); padding: 15px; border-radius: 15px; 
-            margin-bottom: 10px; border-left: 4px solid var(--primary);
+            width: 100%; padding: 16px; background: var(--card); border: 1px solid var(--border);
+            border-radius: 14px; color: white; margin-bottom: 15px; box-sizing: border-box; outline: none;
         }
     </style>
 </head>
 <body>
 
+<div id="toast">Sukces!</div>
+
 <header>
-    <h1>KOREPETYCJE PRO</h1>
+    <h1>EDU CORE PRO</h1>
 </header>
 
 <div id="home" class="page active">
     <div class="tabs">
-        <div class="tab active" onclick="switchCat('tutor', this)">Korepetytorzy</div>
-        <div class="tab" onclick="switchCat('student', this)">Uczniowie</div>
+        <div class="tab active" onclick="changeTab('tutor', this)">Korepetytorzy</div>
+        <div class="tab" onclick="changeTab('student', this)">Uczniowie</div>
     </div>
-    <div class="container" id="adsList"></div>
+    <div class="container" id="adsContainer"></div>
 </div>
 
 <div id="messages" class="page">
     <div class="container">
-        <h2 style="color: var(--primary)">Wiadomości</h2>
-        <div id="msgsList"></div>
+        <h2 style="color: var(--primary); margin-bottom: 20px;">Twoje Rozmowy</h2>
+        <div id="msgsContainer"></div>
     </div>
 </div>
 
 <div id="add" class="page">
     <div class="container">
-        <h2 style="color: var(--primary)">Dodaj Ogłoszenie</h2>
-        <select id="newCat">
-            <option value="tutor">Jestem Korepetytorem</option>
-            <option value="student">Jestem Uczniem</option>
+        <h2 style="color: var(--primary)">Nowa Oferta</h2>
+        <select id="addType">
+            <option value="tutor">Szukam Uczniów</option>
+            <option value="student">Szukam Nauczyciela</option>
         </select>
-        <input type="text" id="newSub" placeholder="Przedmiot">
-        <input type="text" id="newPrice" placeholder="Cena (np. 70 zł/h)">
-        <textarea id="newDesc" style="width:100%; height:100px; background:var(--card); border:1px solid var(--border); border-radius:12px; color:white; padding:12px; margin-bottom:15px; box-sizing:border-box;" placeholder="Opis..."></textarea>
-        <button class="btn-msg" onclick="publishAd()">Opublikuj Ogłoszenie</button>
+        <input type="text" id="addSub" placeholder="Przedmiot">
+        <input type="text" id="addPrice" placeholder="Stawka (np. 80 zł/h)">
+        <textarea id="addDesc" placeholder="Napisz coś więcej o swojej ofercie..."></textarea>
+        <button class="btn-main" onclick="postAd()">Opublikuj Teraz</button>
     </div>
 </div>
 
 <div id="account" class="page">
-    <div class="container" id="accContent"></div>
+    <div class="container" id="profileContent"></div>
 </div>
 
-<div class="modal-overlay" id="modalOverlay">
+<div class="modal-overlay" id="msgModal">
     <div class="modal">
-        <h2 id="modalTitle">Napisz wiadomość</h2>
-        <textarea id="modalText" placeholder="Wpisz treść wiadomości..."></textarea>
-        <div class="modal-btns">
-            <button class="modal-btn btn-cancel" onclick="closeModal()">Anuluj</button>
-            <button class="modal-btn btn-send" onclick="confirmSend()">Wyślij</button>
-        </div>
+        <h2 id="modalName">Napisz wiadomość</h2>
+        <textarea id="modalInput" placeholder="Twoja wiadomość..."></textarea>
+        <button class="btn-main" onclick="confirmSend()">Wyślij Wiadomość</button>
+        <button class="btn-main btn-sec" onclick="closeM()">Anuluj</button>
     </div>
 </div>
 
 <nav class="navbar">
-    <div class="nav-item active" onclick="showP('home', this)"><span class="nav-icon">💎</span>Eksploruj</div>
-    <div class="nav-item" onclick="showP('messages', this)"><span class="nav-icon">💬</span>Czaty</div>
-    <div class="nav-item" onclick="showP('add', this)"><span class="nav-icon">✨</span>Dodaj</div>
-    <div class="nav-item" onclick="showP('account', this)"><span class="nav-icon">⚙️</span>Profil</div>
+    <div class="nav-item active" onclick="nav('home', this)"><span class="nav-icon">💎</span>Eksploruj</div>
+    <div class="nav-item" onclick="nav('messages', this)"><span class="nav-icon">💬</span>Czaty</div>
+    <div class="nav-item" onclick="nav('add', this)"><span class="nav-icon">✨</span>Dodaj</div>
+    <div class="nav-item" onclick="nav('account', this)"><span class="nav-icon">⚙️</span>Profil</div>
 </nav>
 
 <script>
-    let currentCat = 'tutor';
-    let user = JSON.parse(localStorage.getItem('pro_user')) || null;
-    let ads = JSON.parse(localStorage.getItem('pro_ads')) || [];
-    let msgs = JSON.parse(localStorage.getItem('pro_msgs')) || [];
-    let targetAd = null;
+    let cat = 'tutor';
+    let user = JSON.parse(localStorage.getItem('edu_user')) || null;
+    let ads = JSON.parse(localStorage.getItem('edu_ads')) || [];
+    let msgs = JSON.parse(localStorage.getItem('edu_msgs')) || [];
+    let activeChat = null;
 
-    function showP(id, el) {
+    function nav(id, el) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         el.classList.add('active');
         if(id === 'home') renderAds();
         if(id === 'messages') renderMsgs();
-        if(id === 'account') renderAcc();
+        if(id === 'account') renderProfile();
     }
 
-    function switchCat(c, el) {
-        currentCat = c;
+    function changeTab(c, el) {
+        cat = c;
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         el.classList.add('active');
         renderAds();
     }
 
+    function showToast(txt) {
+        const t = document.getElementById('toast');
+        t.innerText = txt;
+        t.style.display = 'block';
+        setTimeout(() => t.style.display = 'none', 2500);
+    }
+
     function renderAds() {
-        const list = document.getElementById('adsList');
-        list.innerHTML = '';
-        ads.filter(a => a.cat === currentCat).slice().reverse().forEach(a => {
-            list.innerHTML += `
+        const div = document.getElementById('adsContainer');
+        div.innerHTML = '';
+        ads.filter(a => a.type === cat).slice().reverse().forEach(a => {
+            div.innerHTML += `
                 <div class="ad-card">
-                    <div style="color: var(--primary); font-size: 12px; margin-bottom: 5px;">@${a.author}</div>
-                    <h3>${a.sub}</h3>
-                    <p>${a.desc}</p>
+                    <div style="font-size:12px; color:var(--primary); margin-bottom:8px;">@${a.user}</div>
+                    <h3 style="margin:0">${a.sub}</h3>
+                    <p style="margin:10px 0">${a.desc}</p>
                     <div class="price-tag">${a.price}</div>
-                    <button class="btn-msg" onclick="openModal('${a.author}', '${a.email}')">Wyślij wiadomość</button>
+                    <button class="btn-main" style="margin-top:15px; padding:10px; font-size:12px" onclick="openM('${a.user}', '${a.email}')">📩 Napisz do autora</button>
                 </div>
             `;
         });
     }
 
-    // MODAL LOGIC
-    function openModal(name, email) {
-        if(!user) return alert("Zaloguj się w zakładce Profil!");
-        targetAd = { name, email };
-        document.getElementById('modalTitle').innerText = `Wiadomość do ${name}`;
-        document.getElementById('modalOverlay').style.display = 'flex';
+    function openM(name, email) {
+        if(!user) return showToast("Zaloguj się najpierw!");
+        activeChat = { name, email };
+        document.getElementById('modalName').innerText = `Wiadomość do ${name}`;
+        document.getElementById('msgModal').style.display = 'flex';
     }
 
-    function closeModal() {
-        document.getElementById('modalOverlay').style.display = 'none';
-        document.getElementById('modalText').value = '';
-    }
+    function closeM() { document.getElementById('msgModal').style.display = 'none'; document.getElementById('modalInput').value = ''; }
 
     function confirmSend() {
-        const txt = document.getElementById('modalText').value;
-        if(!txt) return;
-        msgs.push({ to: targetAd.email, from: user.name, text: txt, date: new Date().toLocaleTimeString() });
-        localStorage.setItem('pro_msgs', JSON.stringify(msgs));
-        closeModal();
-        alert("Wiadomość wysłana pomyślnie!");
+        const val = document.getElementById('modalInput').value;
+        if(!val) return;
+        msgs.push({ to: activeChat.email, from: user.name, fromEmail: user.email, text: val, date: new Date().toLocaleTimeString() });
+        localStorage.setItem('edu_msgs', JSON.stringify(msgs));
+        closeM();
+        showToast("Wiadomość wysłana!");
     }
 
     function renderMsgs() {
-        const list = document.getElementById('msgsList');
-        list.innerHTML = '';
-        const my = msgs.filter(m => m.to === user?.email);
-        if(my.length === 0) list.innerHTML = '<p style="text-align:center; color:var(--sec);">Brak nowych wiadomości.</p>';
-        my.slice().reverse().forEach(m => {
-            list.innerHTML += `
-                <div class="message-bubble">
-                    <b style="color:var(--primary)">${m.from}</b> <small style="color:var(--sec); float:right">${m.date}</small>
-                    <p style="margin: 10px 0 0 0; font-size: 14px;">${m.text}</p>
+        const div = document.getElementById('msgsContainer');
+        div.innerHTML = '';
+        const mine = msgs.filter(m => m.to === user?.email);
+        if(!mine.length) div.innerHTML = '<p style="text-align:center; color:var(--sec)">Cisza... Brak nowych wiadomości.</p>';
+        mine.slice().reverse().forEach(m => {
+            div.innerHTML += `
+                <div class="msg-bubble">
+                    <button class="reply-btn" onclick="openM('${m.from}', '${m.fromEmail}')">ODPISZ</button>
+                    <b style="color:var(--primary)">${m.from}</b> <small style="color:var(--sec); margin-left:10px">${m.date}</small>
+                    <p style="margin:12px 0 0 0; font-size:14px; line-height:1.4">${m.text}</p>
                 </div>
             `;
         });
     }
 
-    function publishAd() {
-        if(!user) return alert("Najpierw stwórz profil!");
+    function postAd() {
+        if(!user) return showToast("Zaloguj się w Profilu!");
         const ad = {
-            cat: document.getElementById('newCat').value,
-            sub: document.getElementById('newSub').value,
-            price: document.getElementById('newPrice').value,
-            desc: document.getElementById('newDesc').value,
-            author: user.name,
+            type: document.getElementById('addType').value,
+            sub: document.getElementById('addSub').value,
+            price: document.getElementById('addPrice').value,
+            desc: document.getElementById('addDesc').value,
+            user: user.name,
             email: user.email
         };
         ads.push(ad);
-        localStorage.setItem('pro_ads', JSON.stringify(ads));
-        alert("Ogłoszenie dodane!");
-        showP('home', document.querySelectorAll('.nav-item')[0]);
+        localStorage.setItem('edu_ads', JSON.stringify(ads));
+        showToast("Ogłoszenie dodane!");
+        nav('home', document.querySelector('.nav-item'));
     }
 
-    function renderAcc() {
-        const div = document.getElementById('accContent');
+    function renderProfile() {
+        const div = document.getElementById('profileContent');
         if(!user) {
-            div.innerHTML = `
-                <h2>Stwórz Profil</h2>
-                <input type="text" id="accName" placeholder="Twój Nick">
-                <input type="email" id="accEmail" placeholder="Twój Email">
-                <button class="btn-msg" onclick="login()">Zapisz i Startuj</button>
-            `;
+            div.innerHTML = `<h2>Wstąp do EDU PRO</h2><input id="pName" placeholder="Twój Nick"><input id="pEmail" placeholder="E-mail"><button class="btn-main" onclick="saveP()">Zarejestruj się</button>`;
         } else {
-            div.innerHTML = `
-                <div style="text-align:center; padding: 30px;">
-                    <div style="width:80px; height:80px; background:var(--primary); border-radius:50%; margin: 0 auto 15px; display:flex; align-items:center; justify-content:center; font-size:30px;">👤</div>
-                    <h2>${user.name}</h2>
-                    <p style="color:var(--sec)">${user.email}</p>
-                    <button class="btn-msg" style="background:#30363d; margin-top:40px;" onclick="logout()">Wyloguj</button>
-                </div>
-            `;
+            div.innerHTML = `<div style="text-align:center"><div style="width:70px;height:70px;background:var(--primary);border-radius:50%;margin:20px auto;display:flex;align-items:center;justify-content:center;font-size:25px">👤</div><h2>${user.name}</h2><p style="color:var(--sec)">${user.email}</p><button class="btn-main btn-sec" onclick="logout()">Wyloguj</button></div>`;
         }
     }
 
-    function login() {
-        const n = document.getElementById('accName').value;
-        const e = document.getElementById('accEmail').value;
-        if(!n || !e) return;
-        user = { name: n, email: e };
-        localStorage.setItem('pro_user', JSON.stringify(user));
-        renderAcc();
+    function saveP() {
+        const n = document.getElementById('pName').value;
+        const e = document.getElementById('pEmail').value;
+        if(n && e) { user = {name:n, email:e}; localStorage.setItem('edu_user', JSON.stringify(user)); renderProfile(); showToast("Konto utworzone!"); }
     }
 
-    function logout() { user = null; localStorage.removeItem('pro_user'); renderAcc(); }
+    function logout() { user = null; localStorage.removeItem('edu_user'); renderProfile(); }
 
     renderAds();
 </script>
