@@ -41,7 +41,6 @@
 
         .container { padding: 15px; max-width: 550px; margin: 0 auto; }
 
-        /* TABS */
         .main-nav-tabs {
             display: flex; background: rgba(255, 255, 255, 0.05); padding: 5px;
             border-radius: 20px; margin-bottom: 20px; border: 1px solid var(--border);
@@ -53,19 +52,19 @@
         }
         .tab-btn.active { background: var(--primary); color: white; }
 
-        /* CHIPS */
         .subject-scroll {
-            display: flex; overflow-x: auto; gap: 8px; margin: 15px 0;
-            padding-bottom: 5px;
+            display: flex; overflow-x: auto; gap: 8px; margin: 10px 0;
+            padding-bottom: 5px; scrollbar-width: none;
         }
+        .subject-scroll::-webkit-scrollbar { display: none; }
+
         .chip {
             white-space: nowrap; padding: 10px 15px; background: rgba(255,255,255,0.05);
             border: 1px solid var(--border); border-radius: 50px; font-size: 13px;
-            font-weight: 600; color: var(--sec); cursor: pointer;
+            font-weight: 600; color: var(--sec); cursor: pointer; transition: 0.2s;
         }
-        .chip.active { background: var(--primary); color: white; }
+        .chip.active { background: var(--primary); color: white; border-color: var(--primary); }
 
-        /* CARDS */
         .ad-card { 
             background: var(--card); border-radius: 28px; padding: 20px; 
             margin-bottom: 15px; border: 1px solid var(--border); 
@@ -75,57 +74,34 @@
             color: var(--primary); border-radius: 8px; font-size: 11px; font-weight: 700; margin-right: 5px;
         }
 
-        /* CHAT WINDOW */
-        #chat-window {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg); z-index: 2000; display: none; flex-direction: column;
-        }
-        .chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
-        .msg { max-width: 80%; padding: 12px; border-radius: 15px; font-size: 14px; }
-        .msg.me { align-self: flex-end; background: var(--primary); }
-        .msg.them { align-self: flex-start; background: var(--card); border: 1px solid var(--border); }
-
-        /* BUTTONS */
         .btn-main {
             width: 100%; padding: 16px; border: none; border-radius: 18px;
             background: var(--grad); color: white; font-weight: 700; cursor: pointer;
         }
         .btn-danger { background: rgba(255, 69, 58, 0.1); color: var(--danger); border: 1px solid var(--danger); }
 
-        /* NAVBAR */
         .navbar {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
             width: 90%; max-width: 400px; background: rgba(28, 33, 40, 0.95);
             backdrop-filter: blur(20px); display: flex; border-radius: 30px;
             border: 1px solid var(--border); padding: 10px 0; z-index: 900;
         }
-        .nav-item { flex: 1; text-align: center; color: var(--sec); cursor: pointer; position: relative; }
-        .nav-item.active { color: var(--primary); }
-        #chat-dot { position: absolute; top: 0; right: 35%; width: 8px; height: 8px; background: var(--danger); border-radius: 50%; display: none; }
+        .nav-item { flex: 1; text-align: center; color: var(--sec); cursor: pointer; }
+        .nav-item.active { color: var(--primary); font-weight: 800; }
 
         .page { display: none; }
         .page.active { display: block; }
+
         input, select, textarea { 
-            width: 100%; padding: 15px; background: rgba(0,0,0,0.2); border: 1px solid var(--border);
-            border-radius: 15px; color: white; margin-bottom: 10px; box-sizing: border-box;
+            width: 100%; padding: 15px; background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+            border-radius: 15px; color: white; margin-bottom: 10px; box-sizing: border-box; outline: none;
         }
+        input:focus { border-color: var(--primary); }
     </style>
 </head>
 <body>
 
-<header><div style="font-weight:800; color:var(--primary)">EDUCORE PRO</div></header>
-
-<div id="chat-window">
-    <div style="padding: 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 15px;">
-        <button onclick="closeChat()" style="background:none; border:none; color:white; font-size: 20px;">←</button>
-        <b id="chat-user-name">Rozmowa</b>
-    </div>
-    <div class="chat-messages" id="chat-box"></div>
-    <div style="padding: 20px; display: flex; gap: 10px;">
-        <input type="text" id="chat-input" placeholder="Wiadomość..." style="margin:0">
-        <button onclick="sendMsg()" style="background:var(--primary); border:none; border-radius:12px; width:50px; color:white">➔</button>
-    </div>
-</div>
+<header><div style="font-weight:800; color:var(--primary); letter-spacing: 1px;">EDUCORE PRO</div></header>
 
 <div id="home" class="page active">
     <div class="container">
@@ -134,71 +110,83 @@
             <button class="tab-btn" id="viewStudents" onclick="toggleHomeView('student')">🎓 Uczniowie</button>
         </div>
         <div class="filter-section">
-            <input type="text" id="filterSearch" placeholder="🔍 Szukaj..." oninput="renderAds()">
-            <div class="subject-scroll" id="homeChips">
+            <input type="text" id="filterSearch" placeholder="🔍 Szukaj przedmiotu..." oninput="renderAds()">
+            <div class="subject-scroll">
                 <div class="chip active" onclick="filterBySub(this, 'all')">Wszystkie</div>
                 <div class="chip" onclick="filterBySub(this, 'Angielski')">🇬🇧 Angielski</div>
                 <div class="chip" onclick="filterBySub(this, 'Matematyka')">🔢 Matematyka</div>
                 <div class="chip" onclick="filterBySub(this, 'Polski')">🇵🇱 Polski</div>
+                <div class="chip" onclick="filterBySub(this, 'Fizyka')">🧪 Fizyka</div>
             </div>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
                 <select id="filterType" onchange="renderAds()">
-                    <option value="all">Wszystkie typy</option>
-                    <option value="online">Zdalnie</option>
-                    <option value="live">Na żywo</option>
+                    <option value="all">Typ lekcji</option>
+                    <option value="online">🌐 Zdalnie</option>
+                    <option value="live">📍 Na żywo</option>
                 </select>
-                <input type="text" id="filterLoc" placeholder="Miasto..." oninput="renderAds()">
+                <input type="text" id="filterLoc" placeholder="Miejscowość..." oninput="renderAds()">
             </div>
         </div>
-        <div id="adsContainer" style="margin-top:20px"></div>
-    </div>
-</div>
-
-<div id="messages" class="page">
-    <div class="container">
-        <h2 style="font-weight: 800;">Wiadomości</h2>
-        <div id="msgsListContainer"></div>
+        <div id="adsContainer" style="margin-top:10px"></div>
     </div>
 </div>
 
 <div id="add" class="page">
     <div class="container">
-        <h2 style="font-weight: 800;">Dodaj ogłoszenie</h2>
+        <h2 style="font-weight: 800; margin-bottom: 5px;">Dodaj ogłoszenie</h2>
+        <p style="color:var(--sec); font-size:14px; margin-bottom: 20px;">Wybierz kogo szukasz i uzupełnij dane.</p>
+        
         <div class="main-nav-tabs">
             <button class="tab-btn active" id="addBtnTutor" onclick="setAddMode('tutor')">Będę uczyć</button>
             <button class="tab-btn" id="addBtnStudent" onclick="setAddMode('student')">Szukam lekcji</button>
         </div>
-        <input type="text" id="addSub" placeholder="Przedmiot (np. Matematyka)">
+
+        <label style="font-size:12px; color:var(--sec); font-weight:700; margin-left:5px;">WYBIERZ PRZEDMIOT</label>
+        <div class="subject-scroll">
+            <div class="chip" onclick="selectAddSub('🇬🇧 Angielski')">🇬🇧 Angielski</div>
+            <div class="chip" onclick="selectAddSub('🔢 Matematyka')">🔢 Matematyka</div>
+            <div class="chip" onclick="selectAddSub('🇵🇱 Polski')">🇵🇱 Polski</div>
+            <div class="chip" onclick="selectAddSub('🧪 Fizyka')">🧪 Fizyka</div>
+            <div class="chip" onclick="selectAddSub('🇩🇪 Niemiecki')">🇩🇪 Niemiecki</div>
+        </div>
+        <input type="text" id="addSub" placeholder="Lub wpisz inny przedmiot...">
+
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
-            <input type="number" id="addPrice" placeholder="Cena zł/h">
+            <input type="number" id="addPrice" placeholder="Cena (zł/h)">
             <select id="addLevel">
-                <option value="A1">Poziom A1</option><option value="B1">Poziom B1</option>
-                <option value="B2">Poziom B2</option><option value="C1">Poziom C1</option>
-                <option value="C2">Poziom C2</option>
+                <option value="Dowolny">Poziom</option>
+                <option value="A1">Podstawowy (A1)</option>
+                <option value="B2">Średni (B2)</option>
+                <option value="C2">Ekspert (C2)</option>
             </select>
         </div>
-        <select id="addType" onchange="document.getElementById('addLoc').style.display = (this.value==='live'?'block':'none')">
-            <option value="online">Zdalnie 🌐</option>
-            <option value="live">Na żywo 📍</option>
+
+        <select id="addType" onchange="document.getElementById('addLocBox').style.display = (this.value==='live'?'block':'none')">
+            <option value="online">Lekcje Zdalne 🌐</option>
+            <option value="live">Lekcje Na żywo 📍</option>
         </select>
-        <input type="text" id="addLoc" placeholder="Miasto" style="display:none">
-        <textarea id="addDesc" rows="4" placeholder="Opis oferty..."></textarea>
-        <button class="btn-main" onclick="postAd()">Opublikuj</button>
+
+        <div id="addLocBox" style="display:none">
+            <input type="text" id="addLoc" placeholder="W jakim mieście?">
+        </div>
+
+        <textarea id="addDesc" rows="4" placeholder="Napisz coś o sobie lub o wymaganiach..."></textarea>
+        
+        <button class="btn-main" onclick="postAd()">Opublikuj ogłoszenie</button>
     </div>
 </div>
 
 <div id="profile" class="page">
     <div class="container" id="profileBox">
         <h2 style="font-weight: 800;">Twój Profil</h2>
-        <input type="text" id="userName" placeholder="Nick">
-        <input type="email" id="userEmail" placeholder="E-mail">
-        <button class="btn-main" onclick="saveUser()">Zapisz</button>
+        <input type="text" id="userName" placeholder="Twoje Imię / Nick">
+        <input type="email" id="userEmail" placeholder="Twój E-mail">
+        <button class="btn-main" onclick="saveUser()">Zapisz Dane</button>
     </div>
 </div>
 
 <nav class="navbar">
     <div class="nav-item active" onclick="nav('home', this)">🏠</div>
-    <div class="nav-item" onclick="nav('messages', this)"><div id="chat-dot"></div>💬</div>
     <div class="nav-item" onclick="nav('add', this)">➕</div>
     <div class="nav-item" onclick="nav('profile', this)">👤</div>
 </nav>
@@ -219,8 +207,11 @@
     let user = JSON.parse(localStorage.getItem('edu_user'));
     let homeView = 'tutor';
     let addMode = 'tutor';
-    let selectedSub = 'all';
-    let activeChat = null;
+    let selectedHomeSub = 'all';
+
+    function selectAddSub(val) {
+        document.getElementById('addSub').value = val;
+    }
 
     function setAddMode(m) {
         addMode = m;
@@ -238,7 +229,7 @@
     function filterBySub(el, s) {
         document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
         el.classList.add('active');
-        selectedSub = s;
+        selectedHomeSub = s;
         renderAds();
     }
 
@@ -248,7 +239,6 @@
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         el.classList.add('active');
         if(id === 'home') renderAds();
-        if(id === 'messages') renderChatList();
         if(id === 'profile') renderProfile();
     }
 
@@ -264,15 +254,24 @@
 
     function renderProfile() {
         if(user) {
-            document.getElementById('profileBox').innerHTML = `<h2>Cześć, ${user.name}!</h2><p>${user.email}</p><button class="btn-main btn-danger" onclick="localStorage.clear(); location.reload();">Wyloguj</button>`;
+            document.getElementById('profileBox').innerHTML = `
+                <div style="text-align:center">
+                    <div style="font-size:60px; margin-bottom:10px">👤</div>
+                    <h2>${user.name}</h2>
+                    <p style="color:var(--sec)">${user.email}</p>
+                    <button class="btn-main btn-danger" style="margin-top:20px" onclick="localStorage.clear(); location.reload();">Wyloguj się</button>
+                </div>`;
         }
     }
 
     function postAd() {
-        if(!user) return alert("Uzupełnij profil!");
+        if(!user) return alert("Uzupełnij profil w zakładce profilu!");
+        const sub = document.getElementById('addSub').value;
+        const price = document.getElementById('addPrice').value;
+        if(!sub || !price) return alert("Podaj przedmiot i cenę!");
+
         db.ref('ads').push({
-            sub: document.getElementById('addSub').value,
-            price: document.getElementById('addPrice').value,
+            sub, price,
             level: document.getElementById('addLevel').value,
             type: document.getElementById('addType').value,
             loc: document.getElementById('addLoc').value || "",
@@ -281,7 +280,10 @@
             owner: user.name,
             email: user.email,
             time: Date.now()
-        }).then(() => { alert("Dodano!"); nav('home', document.querySelectorAll('.nav-item')[0]); });
+        }).then(() => { 
+            alert("Ogłoszenie dodane!"); 
+            nav('home', document.querySelectorAll('.nav-item')[0]); 
+        });
     }
 
     function renderAds() {
@@ -295,7 +297,7 @@
             snap.forEach(child => {
                 const a = child.val();
                 if (a.role !== homeView) return;
-                if (selectedSub !== 'all' && !a.sub.includes(selectedSub)) return;
+                if (selectedHomeSub !== 'all' && !a.sub.includes(selectedHomeSub)) return;
                 if (search && !a.sub.toLowerCase().includes(search)) return;
                 if (type !== 'all' && a.type !== type) return;
                 if (city && a.loc && !a.loc.toLowerCase().includes(city)) return;
@@ -308,64 +310,17 @@
                             <span class="badge">${a.type === 'online' ? '🌐 Zdalnie' : '📍 ' + a.loc}</span>
                         </div>
                         <h3 style="margin:0">${a.sub}</h3>
-                        <p style="color:var(--sec); font-size:13px">${a.desc}</p>
-                        <div style="font-weight:800; font-size:18px; margin:10px 0">${a.price} zł/h</div>
-                        ${isMe ? `<button class="btn-main btn-danger" onclick="db.ref('ads').child('${child.key}').remove()">Usuń moje ogłoszenie</button>` : 
-                        `<button class="btn-main" onclick="openChat('${a.owner}', '${a.email}')">Napisz wiadomość</button>`}
+                        <p style="color:var(--sec); font-size:13px; margin:10px 0;">${a.desc}</p>
+                        <div style="font-weight:800; font-size:18px; color:white">${a.price} zł/h</div>
+                        ${isMe ? `<button class="btn-main btn-danger" style="margin-top:10px" onclick="db.ref('ads').child('${child.key}').remove()">Usuń ogłoszenie</button>` : 
+                        `<button class="btn-main" style="margin-top:10px" onclick="alert('Napisz do: ${a.email}')">Napisz wiadomość</button>`}
                     </div>`;
             });
         });
     }
 
-    // CHAT LOGIC
-    function openChat(name, email) {
-        if(!user) return nav('profile', document.querySelectorAll('.nav-item')[3]);
-        activeChat = {name, email};
-        document.getElementById('chat-user-name').innerText = name;
-        document.getElementById('chat-window').style.display = 'flex';
-        const chatId = [user.email, email].sort().join('_').replace(/\./g, ',');
-        db.ref('chats/' + chatId).on('value', (snap) => {
-            const box = document.getElementById('chat-box'); box.innerHTML = '';
-            snap.forEach(mChild => {
-                const m = mChild.val();
-                const side = m.sender === user.email ? 'me' : 'them';
-                box.innerHTML += `<div class="msg ${side}">${m.text}</div>`;
-            });
-            box.scrollTop = box.scrollHeight;
-        });
-    }
-
-    function closeChat() { document.getElementById('chat-window').style.display = 'none'; }
-
-    function sendMsg() {
-        const input = document.getElementById('chat-input');
-        if(!input.value || !activeChat) return;
-        const chatId = [user.email, activeChat.email].sort().join('_').replace(/\./g, ',');
-        db.ref('chats/' + chatId).push({ sender: user.email, text: input.value, time: Date.now() });
-        db.ref('notifications/' + activeChat.email.replace(/\./g, ',')).set(Date.now());
-        input.value = '';
-    }
-
-    function renderChatList() {
-        const container = document.getElementById('msgsListContainer');
-        db.ref('chats').once('value', (snap) => {
-            container.innerHTML = '';
-            snap.forEach(chat => {
-                if(chat.key.includes(user.email.replace(/\./g, ','))) {
-                    const partner = chat.key.replace(user.email.replace(/\./g, ','), '').replace('_', '').replace(/,/g, '.');
-                    container.innerHTML += `<div class="ad-card" onclick="openChat('Rozmowa', '${partner}')"><b>Czat z: ${partner}</b></div>`;
-                }
-            });
-        });
-    }
-
     renderAds();
-    if(user) {
-        renderProfile();
-        db.ref('notifications/' + user.email.replace(/\./g, ',')).on('value', () => {
-            document.getElementById('chat-dot').style.display = 'block';
-        });
-    }
+    if(user) renderProfile();
 </script>
 </body>
 </html>
