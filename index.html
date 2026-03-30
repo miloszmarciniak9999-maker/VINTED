@@ -1,252 +1,172 @@
 ```html
-<!-- Wklej CAŁOŚĆ jako jeden plik HTML -->
 <!DOCTYPE html>
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EDU CORE PRO</title>
 
 <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
-
-:root{
---bg:#0b0e14;
---card:#1c2128;
---primary:#007aff;
---text:#f0f6fc;
---sec:#8b949e;
---border:rgba(255,255,255,0.08);
---danger:#ff453a;
-}
-
-body{
-font-family:'Plus Jakarta Sans',sans-serif;
-background:var(--bg);
-color:var(--text);
-margin:0;
-padding-bottom:100px;
-}
-
-.container{padding:12px;max-width:480px;margin:0 auto;}
-
-input,select,textarea{
-width:100%;
-padding:14px;
-background:#1c2128;
-border:1px solid var(--border);
-border-radius:15px;
-color:white;
-margin-bottom:10px;
-box-sizing:border-box;
-}
-
-.page{display:none;}
-.page.active{display:block;}
-
-.ad-card{
-background:var(--card);
-border-radius:20px;
-padding:18px;
-margin-bottom:12px;
-border:1px solid var(--border);
-}
-
-.navbar{
-position:fixed;
-bottom:15px;
-left:50%;
-transform:translateX(-50%);
-width:90%;
-max-width:380px;
-background:rgba(28,33,40,0.95);
-display:flex;
-border-radius:25px;
-border:1px solid var(--border);
-padding:10px 0;
-}
-
-.nav-item{
-flex:1;
-text-align:center;
-color:var(--sec);
-cursor:pointer;
-font-size:22px;
-}
-
-.nav-item.active{color:var(--primary);}
-
-#chat-window{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:var(--bg);
-z-index:2000;
-display:none;
-flex-direction:column;
-}
-
-.btn-action{
-width:100%;
-padding:14px;
-border-radius:14px;
-border:none;
-font-weight:700;
-cursor:pointer;
-}
+body{margin:0;background:#0b0e14;color:white;font-family:sans-serif}
+.page{display:none;padding:15px}
+.page.active{display:block}
+.navbar{position:fixed;bottom:0;left:0;right:0;background:#111;display:flex}
+.nav-item{flex:1;text-align:center;padding:15px;color:#aaa}
+.nav-item.active{color:#007aff}
+input,textarea,select{width:100%;padding:12px;margin-bottom:10px;background:#1c2128;border:none;border-radius:10px;color:white}
+button{padding:12px;border:none;border-radius:10px;background:#007aff;color:white;width:100%}
+.ad-card{background:#1c2128;padding:15px;border-radius:15px;margin-bottom:10px}
+#chat-window{position:fixed;top:0;left:0;width:100%;height:100%;background:#0b0e14;display:none;flex-direction:column}
 </style>
 </head>
 
 <body>
 
-<div id="chat-window">
-<div style="padding:15px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between">
-<b id="chat-title">Rozmowa</b>
-<button onclick="closeChat()" style="background:none;border:none;color:white;font-size:22px">✕</button>
+<div id="home" class="page active">
+<h2>Ogłoszenia</h2>
+<div id="ads"></div>
 </div>
 
-<div id="chat-box" style="flex:1;overflow:auto;padding:15px;display:flex;flex-direction:column;gap:10px"></div>
-
-<div style="padding:15px;display:flex;gap:8px">
-<input id="chat-input" placeholder="Wiadomość...">
-<button onclick="sendMsg()" style="width:50px;background:var(--primary);border:none;border-radius:12px;color:white">➔</button>
-</div>
-</div>
-
-<div id="messages" class="page active">
-<div class="container">
+<div id="messages" class="page">
 <h2>Wiadomości</h2>
-<div id="chatListContainer"></div>
+<div id="chatList"></div>
+</div>
+
+<div id="add" class="page">
+<h2>Dodaj ogłoszenie</h2>
+<input id="sub" placeholder="Przedmiot">
+<input id="price" placeholder="Cena">
+<textarea id="desc" placeholder="Opis"></textarea>
+<button onclick="postAd()">Dodaj</button>
+</div>
+
+<div id="profile" class="page">
+<h2>Profil</h2>
+<input id="name" placeholder="Imię">
+<input id="email" placeholder="Email">
+<button onclick="saveUser()">Zapisz</button>
+</div>
+
+<div id="chat-window">
+<div style="padding:10px;border-bottom:1px solid #333">
+<b id="chat-title"></b>
+<button onclick="closeChat()" style="float:right">X</button>
+</div>
+<div id="chat-box" style="flex:1;overflow:auto;padding:10px"></div>
+<div style="display:flex">
+<input id="chat-input">
+<button onclick="sendMsg()">➤</button>
 </div>
 </div>
 
-<nav class="navbar">
-<div class="nav-item active" onclick="renderChatList()">💬</div>
-</nav>
+<div class="navbar">
+<div class="nav-item active" onclick="nav('home',this)">🏠</div>
+<div class="nav-item" onclick="nav('messages',this)">💬</div>
+<div class="nav-item" onclick="nav('add',this)">➕</div>
+<div class="nav-item" onclick="nav('profile',this)">👤</div>
+</div>
 
 <script>
-// FIREBASE
 const firebaseConfig={
 apiKey:"AIzaSyAbs_Z_Oqy2FrWP3CuGK9w9qjDMYGDhgck",
 authDomain:"educore-5c9f4.firebaseapp.com",
 databaseURL:"https://educore-5c9f4-default-rtdb.europe-west1.firebasedatabase.app/",
-projectId:"educore-5c9f4",
-storageBucket:"educore-5c9f4.firebasestorage.app",
-messagingSenderId:"213055938628",
-appId:"1:213055938628:web:408b3beb4273d4f6f59c11"
+projectId:"educore-5c9f4"
 };
 
 firebase.initializeApp(firebaseConfig);
 const db=firebase.database();
 
-let user=JSON.parse(localStorage.getItem('edu_user')) || {name:"User",email:prompt("Podaj email")};
-localStorage.setItem('edu_user',JSON.stringify(user));
-
+let user=JSON.parse(localStorage.getItem('user'))||{};
 let activeChatID=null;
 
-function cleanEmail(e){return e.toLowerCase().replace(/\./g,',')}
-function getChatID(a,b){return [cleanEmail(a),cleanEmail(b)].sort().join('_')}
+function nav(id,el){
+document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+el.classList.add('active');
+if(id==="home")loadAds();
+if(id==="messages")loadChats();
+}
 
-// CLEAR OLD
-db.ref('chats').remove();
+function saveUser(){
+user={name:name.value,email:email.value};
+localStorage.setItem('user',JSON.stringify(user));
+}
 
-// OPEN CHAT
+function postAd(){
+db.ref('ads').push({sub:sub.value,price:price.value,desc:desc.value,owner:user.email});
+}
+
+function loadAds(){
+db.ref('ads').on('value',snap=>{
+ads.innerHTML='';
+snap.forEach(c=>{
+let a=c.val();
+ads.innerHTML+=`
+<div class="ad-card">
+<b>${a.sub}</b><br>
+${a.price} zł<br>
+<button onclick="openChat('${a.owner}','${a.owner}')">Napisz</button>
+</div>`;
+});
+});
+}
+
+function clean(e){return e.replace(/\./g,',')}
+function chatID(a,b){return[clean(a),clean(b)].sort().join('_')}
+
 function openChat(email,name){
-
-activeChatID=getChatID(user.email,email);
-
-document.getElementById('chat-title').innerText=name;
-document.getElementById('chat-window').style.display='flex';
+activeChatID=chatID(user.email,email);
+chat-title.innerText=name;
+chat-window.style.display='flex';
 
 db.ref('chats/'+activeChatID).off();
 
-db.ref('chats/'+activeChatID)
-.orderByChild('time')
-.on('value',snap=>{
-
-const box=document.getElementById('chat-box');
-box.innerHTML='';
-
+db.ref('chats/'+activeChatID).on('value',snap=>{
+chat-box.innerHTML='';
 snap.forEach(m=>{
-const d=m.val();
-const me=d.sender===user.email;
-
-box.innerHTML+=`
-<div onclick="deleteMsg('${m.key}')"
-style="
-align-self:${me?'flex-end':'flex-start'};
-background:${me?'#007aff':'#252b33'};
-padding:10px;
-border-radius:12px;
-max-width:80%">
-${d.text}
-</div>`;
+let d=m.val();
+chat-box.innerHTML+=`<div>${d.text}</div>`;
 });
-
-box.scrollTop=box.scrollHeight;
 });
 }
 
-// SEND
 function sendMsg(){
-const i=document.getElementById('chat-input');
-if(!i.value.trim()) return;
-
 db.ref('chats/'+activeChatID).push({
 sender:user.email,
-text:i.value.trim(),
+text:chat-input.value,
 time:Date.now()
 });
-
-i.value='';
+chat-input.value='';
 }
 
-// ENTER
-document.getElementById('chat-input').addEventListener('keypress',e=>{
-if(e.key==='Enter') sendMsg();
+chat-input.addEventListener('keypress',e=>{
+if(e.key==='Enter')sendMsg();
 });
 
-// DELETE
-function deleteMsg(id){
-db.ref('chats/'+activeChatID+'/'+id).remove();
-}
-
-// CLOSE
 function closeChat(){
-if(activeChatID) db.ref('chats/'+activeChatID).off();
-document.getElementById('chat-window').style.display='none';
+chat-window.style.display='none';
 }
 
-// LIST
-function renderChatList(){
-
-const my=cleanEmail(user.email);
-
+function loadChats(){
 db.ref('chats').on('value',snap=>{
-
-const list=document.getElementById('chatListContainer');
-list.innerHTML='';
-
+chatList.innerHTML='';
 snap.forEach(c=>{
-if(!c.key.includes(my)) return;
-
-const parts=c.key.split('_');
-const partner=parts.find(p=>p!==my).replace(/,/g,'.');
-
-list.innerHTML+=`
-<div class="ad-card" onclick="openChat('${partner}','${partner}')">
-💬 ${partner}
+if(!c.key.includes(clean(user.email)))return;
+let p=c.key.replace(clean(user.email),'').replace('_','').replace(/,/g,'.');
+chatList.innerHTML+=`
+<div class="ad-card" onclick="openChat('${p}','${p}')">
+💬 ${p}
 </div>`;
 });
 });
 }
 
-renderChatList();
+loadAds();
 </script>
 
 </body>
