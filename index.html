@@ -17,9 +17,8 @@
             --primary: #007aff;
             --text: #f0f6fc;
             --sec: #8b949e;
-            --border: rgba(255, 255, 255, 0.1);
+            --border: rgba(255, 255, 255, 0.08);
             --danger: #ff453a;
-            --grad: linear-gradient(135deg, #007aff 0%, #0051af 100%);
         }
 
         body {
@@ -27,166 +26,127 @@
             background-color: var(--bg);
             color: var(--text);
             margin: 0;
-            padding-bottom: 110px;
+            padding-bottom: 100px;
         }
 
-        header {
-            padding: 20px;
-            text-align: center;
-            background: rgba(11, 14, 20, 0.8);
-            backdrop-filter: blur(20px);
-            position: sticky; top: 0; z-index: 1000;
-            border-bottom: 1px solid var(--border);
+        /* --- TOAST NOTIFICATION (ZAMIAST BRZYDKIEGO ALERTA) --- */
+        #toast {
+            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+            background: var(--primary); color: white; padding: 12px 25px;
+            border-radius: 50px; font-weight: 600; z-index: 9999;
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .container { padding: 15px; max-width: 550px; margin: 0 auto; }
+        /* --- UI FIX DLA SELECT I INPUT (DARK MODE) --- */
+        select, input, textarea { 
+            width: 100%; padding: 16px; background: #252b33 !important; 
+            border: 1px solid var(--border) !important;
+            border-radius: 18px; color: white !important; margin-bottom: 12px; 
+            font-size: 15px; outline: none; appearance: none; box-sizing: border-box;
+        }
+
+        /* --- KARTY OGŁOSZEŃ --- */
+        .ad-card { 
+            background: var(--card); border-radius: 24px; padding: 20px; 
+            margin-bottom: 15px; border: 1px solid var(--border); 
+        }
 
         .main-nav-tabs {
-            display: flex; background: rgba(255, 255, 255, 0.05); padding: 5px;
+            display: flex; background: rgba(255, 255, 255, 0.03); padding: 5px;
             border-radius: 20px; margin-bottom: 20px; border: 1px solid var(--border);
         }
         .tab-btn {
             flex: 1; padding: 12px; border: none; border-radius: 16px;
             background: transparent; color: var(--sec); cursor: pointer;
-            font-weight: 600; font-size: 14px;
+            font-weight: 600; transition: 0.3s;
         }
         .tab-btn.active { background: var(--primary); color: white; }
 
-        .subject-scroll {
-            display: flex; overflow-x: auto; gap: 8px; margin: 10px 0;
-            padding-bottom: 5px; scrollbar-width: none;
-        }
-        .subject-scroll::-webkit-scrollbar { display: none; }
-
-        .chip {
-            white-space: nowrap; padding: 10px 15px; background: rgba(255,255,255,0.05);
-            border: 1px solid var(--border); border-radius: 50px; font-size: 13px;
-            font-weight: 600; color: var(--sec); cursor: pointer; transition: 0.2s;
-        }
-        .chip.active { background: var(--primary); color: white; border-color: var(--primary); }
-
-        .ad-card { 
-            background: var(--card); border-radius: 28px; padding: 20px; 
-            margin-bottom: 15px; border: 1px solid var(--border); 
-        }
-        .badge {
-            display: inline-block; padding: 4px 10px; background: rgba(0, 122, 255, 0.1);
-            color: var(--primary); border-radius: 8px; font-size: 11px; font-weight: 700; margin-right: 5px;
-        }
-
-        .btn-main {
-            width: 100%; padding: 16px; border: none; border-radius: 18px;
-            background: var(--grad); color: white; font-weight: 700; cursor: pointer;
-        }
-        .btn-danger { background: rgba(255, 69, 58, 0.1); color: var(--danger); border: 1px solid var(--danger); }
-
+        /* --- NAVBAR --- */
         .navbar {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
             width: 90%; max-width: 400px; background: rgba(28, 33, 40, 0.95);
-            backdrop-filter: blur(20px); display: flex; border-radius: 30px;
-            border: 1px solid var(--border); padding: 10px 0; z-index: 900;
+            backdrop-filter: blur(15px); display: flex; border-radius: 30px;
+            border: 1px solid var(--border); padding: 12px 0; z-index: 900;
         }
-        .nav-item { flex: 1; text-align: center; color: var(--sec); cursor: pointer; }
-        .nav-item.active { color: var(--primary); font-weight: 800; }
+        .nav-item { flex: 1; text-align: center; color: var(--sec); cursor: pointer; font-size: 22px; }
+        .nav-item.active { color: var(--primary); }
+
+        /* --- CZAT MODAL --- */
+        #chat-window {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg); z-index: 2000; display: none; flex-direction: column;
+        }
 
         .page { display: none; }
         .page.active { display: block; }
-
-        input, select, textarea { 
-            width: 100%; padding: 15px; background: rgba(255,255,255,0.05); border: 1px solid var(--border);
-            border-radius: 15px; color: white; margin-bottom: 10px; box-sizing: border-box; outline: none;
-        }
-        input:focus { border-color: var(--primary); }
     </style>
 </head>
 <body>
 
-<header><div style="font-weight:800; color:var(--primary); letter-spacing: 1px;">EDUCORE PRO</div></header>
+<div id="toast">Gotowe!</div>
+
+<div id="chat-window">
+    <div style="padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+        <b id="chat-title">Rozmowa</b>
+        <button onclick="closeChat()" style="background:none; border:none; color:white; font-size: 20px;">✕</button>
+    </div>
+    <div id="chat-box" style="flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:10px;"></div>
+    <div style="padding: 20px; display: flex; gap: 10px;">
+        <input type="text" id="chat-input" placeholder="Napisz wiadomość..." style="margin:0">
+        <button onclick="sendMsg()" style="background:var(--primary); border:none; border-radius:15px; width:60px; color:white;">➔</button>
+    </div>
+</div>
 
 <div id="home" class="page active">
-    <div class="container">
+    <div style="padding: 15px;">
         <div class="main-nav-tabs">
-            <button class="tab-btn active" id="viewTutors" onclick="toggleHomeView('tutor')">👨‍🏫 Nauczyciele</button>
-            <button class="tab-btn" id="viewStudents" onclick="toggleHomeView('student')">🎓 Uczniowie</button>
+            <button class="tab-btn active" id="t-tutor" onclick="setHomeView('tutor')">👨‍🏫 Nauczyciele</button>
+            <button class="tab-btn" id="t-student" onclick="setHomeView('student')">🎓 Uczniowie</button>
         </div>
-        <div class="filter-section">
-            <input type="text" id="filterSearch" placeholder="🔍 Szukaj przedmiotu..." oninput="renderAds()">
-            <div class="subject-scroll">
-                <div class="chip active" onclick="filterBySub(this, 'all')">Wszystkie</div>
-                <div class="chip" onclick="filterBySub(this, 'Angielski')">🇬🇧 Angielski</div>
-                <div class="chip" onclick="filterBySub(this, 'Matematyka')">🔢 Matematyka</div>
-                <div class="chip" onclick="filterBySub(this, 'Polski')">🇵🇱 Polski</div>
-                <div class="chip" onclick="filterBySub(this, 'Fizyka')">🧪 Fizyka</div>
-            </div>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
-                <select id="filterType" onchange="renderAds()">
-                    <option value="all">Typ lekcji</option>
-                    <option value="online">🌐 Zdalnie</option>
-                    <option value="live">📍 Na żywo</option>
-                </select>
-                <input type="text" id="filterLoc" placeholder="Miejscowość..." oninput="renderAds()">
-            </div>
-        </div>
-        <div id="adsContainer" style="margin-top:10px"></div>
+        <div id="adsContainer"></div>
+    </div>
+</div>
+
+<div id="messages" class="page">
+    <div style="padding: 20px;">
+        <h2>Wiadomości</h2>
+        <div id="chatListContainer"></div>
     </div>
 </div>
 
 <div id="add" class="page">
-    <div class="container">
-        <h2 style="font-weight: 800; margin-bottom: 5px;">Dodaj ogłoszenie</h2>
-        <p style="color:var(--sec); font-size:14px; margin-bottom: 20px;">Wybierz kogo szukasz i uzupełnij dane.</p>
-        
+    <div style="padding: 20px;">
+        <h2>Dodaj ogłoszenie</h2>
         <div class="main-nav-tabs">
-            <button class="tab-btn active" id="addBtnTutor" onclick="setAddMode('tutor')">Będę uczyć</button>
-            <button class="tab-btn" id="addBtnStudent" onclick="setAddMode('student')">Szukam lekcji</button>
+            <button class="tab-btn active" id="a-tutor" onclick="addRole='tutor'; updateAddTabs()">Będę uczyć</button>
+            <button class="tab-btn" id="a-student" onclick="addRole='student'; updateAddTabs()">Szukam lekcji</button>
         </div>
-
-        <label style="font-size:12px; color:var(--sec); font-weight:700; margin-left:5px;">WYBIERZ PRZEDMIOT</label>
-        <div class="subject-scroll">
-            <div class="chip" onclick="selectAddSub('🇬🇧 Angielski')">🇬🇧 Angielski</div>
-            <div class="chip" onclick="selectAddSub('🔢 Matematyka')">🔢 Matematyka</div>
-            <div class="chip" onclick="selectAddSub('🇵🇱 Polski')">🇵🇱 Polski</div>
-            <div class="chip" onclick="selectAddSub('🧪 Fizyka')">🧪 Fizyka</div>
-            <div class="chip" onclick="selectAddSub('🇩🇪 Niemiecki')">🇩🇪 Niemiecki</div>
-        </div>
-        <input type="text" id="addSub" placeholder="Lub wpisz inny przedmiot...">
-
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
-            <input type="number" id="addPrice" placeholder="Cena (zł/h)">
-            <select id="addLevel">
-                <option value="Dowolny">Poziom</option>
-                <option value="A1">Podstawowy (A1)</option>
-                <option value="B2">Średni (B2)</option>
-                <option value="C2">Ekspert (C2)</option>
-            </select>
-        </div>
-
-        <select id="addType" onchange="document.getElementById('addLocBox').style.display = (this.value==='live'?'block':'none')">
-            <option value="online">Lekcje Zdalne 🌐</option>
-            <option value="live">Lekcje Na żywo 📍</option>
+        <input type="text" id="addSub" placeholder="Przedmiot (np. Matematyka)">
+        <input type="number" id="addPrice" placeholder="Cena zł/h">
+        <select id="addLevel">
+            <option value="Dowolny">Dowolny Poziom</option>
+            <option value="Podstawowy">Podstawowy</option>
+            <option value="Średni">Średni</option>
+            <option value="Zaawansowany">Zaawansowany</option>
         </select>
-
-        <div id="addLocBox" style="display:none">
-            <input type="text" id="addLoc" placeholder="W jakim mieście?">
-        </div>
-
-        <textarea id="addDesc" rows="4" placeholder="Napisz coś o sobie lub o wymaganiach..."></textarea>
-        
-        <button class="btn-main" onclick="postAd()">Opublikuj ogłoszenie</button>
+        <textarea id="addDesc" rows="4" placeholder="Opis ogłoszenia..."></textarea>
+        <button onclick="postAd()" style="width:100%; padding:18px; border-radius:18px; border:none; background:var(--primary); color:white; font-weight:800;">Opublikuj</button>
     </div>
 </div>
 
 <div id="profile" class="page">
-    <div class="container" id="profileBox">
-        <h2 style="font-weight: 800;">Twój Profil</h2>
-        <input type="text" id="userName" placeholder="Twoje Imię / Nick">
+    <div style="padding: 20px;">
+        <h2>Twój Profil</h2>
+        <input type="text" id="userName" placeholder="Twoje Imię">
         <input type="email" id="userEmail" placeholder="Twój E-mail">
-        <button class="btn-main" onclick="saveUser()">Zapisz Dane</button>
+        <button onclick="saveUser()" style="width:100%; padding:15px; border-radius:15px; border:none; background:var(--primary); color:white;">Zapisz</button>
     </div>
 </div>
 
 <nav class="navbar">
     <div class="nav-item active" onclick="nav('home', this)">🏠</div>
+    <div class="nav-item" onclick="nav('messages', this)">💬</div>
     <div class="nav-item" onclick="nav('add', this)">➕</div>
     <div class="nav-item" onclick="nav('profile', this)">👤</div>
 </nav>
@@ -203,34 +163,15 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-    
+
     let user = JSON.parse(localStorage.getItem('edu_user'));
-    let homeView = 'tutor';
-    let addMode = 'tutor';
-    let selectedHomeSub = 'all';
+    let currentView = 'tutor';
+    let addRole = 'tutor';
+    let activeChatID = null;
 
-    function selectAddSub(val) {
-        document.getElementById('addSub').value = val;
-    }
-
-    function setAddMode(m) {
-        addMode = m;
-        document.getElementById('addBtnTutor').classList.toggle('active', m === 'tutor');
-        document.getElementById('addBtnStudent').classList.toggle('active', m === 'student');
-    }
-
-    function toggleHomeView(v) {
-        homeView = v;
-        document.getElementById('viewTutors').classList.toggle('active', v === 'tutor');
-        document.getElementById('viewStudents').classList.toggle('active', v === 'student');
-        renderAds();
-    }
-
-    function filterBySub(el, s) {
-        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-        el.classList.add('active');
-        selectedHomeSub = s;
-        renderAds();
+    function showToast(m) {
+        const t = document.getElementById('toast'); t.innerText = m; t.style.top = '30px';
+        setTimeout(() => t.style.top = '-100px', 3000);
     }
 
     function nav(id, el) {
@@ -239,7 +180,19 @@
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         el.classList.add('active');
         if(id === 'home') renderAds();
-        if(id === 'profile') renderProfile();
+        if(id === 'messages') renderChatList();
+    }
+
+    function setHomeView(v) {
+        currentView = v;
+        document.getElementById('t-tutor').classList.toggle('active', v==='tutor');
+        document.getElementById('t-student').classList.toggle('active', v==='student');
+        renderAds();
+    }
+
+    function updateAddTabs() {
+        document.getElementById('a-tutor').classList.toggle('active', addRole==='tutor');
+        document.getElementById('a-student').classList.toggle('active', addRole==='student');
     }
 
     function saveUser() {
@@ -248,79 +201,84 @@
         if(n && e) {
             user = {name: n, email: e};
             localStorage.setItem('edu_user', JSON.stringify(user));
-            location.reload();
-        }
-    }
-
-    function renderProfile() {
-        if(user) {
-            document.getElementById('profileBox').innerHTML = `
-                <div style="text-align:center">
-                    <div style="font-size:60px; margin-bottom:10px">👤</div>
-                    <h2>${user.name}</h2>
-                    <p style="color:var(--sec)">${user.email}</p>
-                    <button class="btn-main btn-danger" style="margin-top:20px" onclick="localStorage.clear(); location.reload();">Wyloguj się</button>
-                </div>`;
+            showToast("Zapisano profil!");
         }
     }
 
     function postAd() {
-        if(!user) return alert("Uzupełnij profil w zakładce profilu!");
-        const sub = document.getElementById('addSub').value;
-        const price = document.getElementById('addPrice').value;
-        if(!sub || !price) return alert("Podaj przedmiot i cenę!");
-
-        db.ref('ads').push({
-            sub, price,
+        if(!user) return showToast("Uzupełnij profil najpierw!");
+        const data = {
+            sub: document.getElementById('addSub').value,
+            price: document.getElementById('addPrice').value,
             level: document.getElementById('addLevel').value,
-            type: document.getElementById('addType').value,
-            loc: document.getElementById('addLoc').value || "",
             desc: document.getElementById('addDesc').value,
-            role: addMode,
-            owner: user.name,
-            email: user.email,
-            time: Date.now()
-        }).then(() => { 
-            alert("Ogłoszenie dodane!"); 
-            nav('home', document.querySelectorAll('.nav-item')[0]); 
+            role: addRole, owner: user.name, email: user.email, time: Date.now()
+        };
+        db.ref('ads').push(data).then(() => {
+            showToast("Ogłoszenie dodane!");
+            nav('home', document.querySelectorAll('.nav-item')[0]);
         });
     }
 
     function renderAds() {
-        const search = document.getElementById('filterSearch').value.toLowerCase();
-        const city = document.getElementById('filterLoc').value.toLowerCase();
-        const type = document.getElementById('filterType').value;
-
-        db.ref('ads').on('value', (snap) => {
-            const container = document.getElementById('adsContainer');
-            container.innerHTML = '';
-            snap.forEach(child => {
-                const a = child.val();
-                if (a.role !== homeView) return;
-                if (selectedHomeSub !== 'all' && !a.sub.includes(selectedHomeSub)) return;
-                if (search && !a.sub.toLowerCase().includes(search)) return;
-                if (type !== 'all' && a.type !== type) return;
-                if (city && a.loc && !a.loc.toLowerCase().includes(city)) return;
-
+        db.ref('ads').on('value', snap => {
+            const cont = document.getElementById('adsContainer'); cont.innerHTML = '';
+            snap.forEach(c => {
+                const a = c.val();
+                if(a.role !== currentView) return;
                 const isMe = user && user.email === a.email;
-                container.innerHTML += `
+                cont.innerHTML += `
                     <div class="ad-card">
-                        <div style="margin-bottom:10px">
-                            <span class="badge">${a.level}</span>
-                            <span class="badge">${a.type === 'online' ? '🌐 Zdalnie' : '📍 ' + a.loc}</span>
-                        </div>
-                        <h3 style="margin:0">${a.sub}</h3>
-                        <p style="color:var(--sec); font-size:13px; margin:10px 0;">${a.desc}</p>
-                        <div style="font-weight:800; font-size:18px; color:white">${a.price} zł/h</div>
-                        ${isMe ? `<button class="btn-main btn-danger" style="margin-top:10px" onclick="db.ref('ads').child('${child.key}').remove()">Usuń ogłoszenie</button>` : 
-                        `<button class="btn-main" style="margin-top:10px" onclick="alert('Napisz do: ${a.email}')">Napisz wiadomość</button>`}
+                        <small style="color:var(--primary); font-weight:800;">${a.level.toUpperCase()}</small>
+                        <h3 style="margin:5px 0">${a.sub}</h3>
+                        <p style="color:var(--sec); font-size:14px;">${a.desc}</p>
+                        <div style="font-weight:800; font-size:20px; margin-bottom:15px;">${a.price} zł/h</div>
+                        ${isMe ? `<button onclick="db.ref('ads').child('${c.key}').remove()" style="width:100%; padding:12px; background:var(--danger); border:none; border-radius:12px; color:white;">Usuń moje ogłoszenie</button>` : 
+                        `<button onclick="openChat('${a.email}','${a.owner}')" style="width:100%; padding:12px; background:var(--primary); border:none; border-radius:12px; color:white;">Napisz wiadomość</button>`}
                     </div>`;
             });
         });
     }
 
+    function openChat(pEmail, pName) {
+        if(!user) return nav('profile', document.querySelectorAll('.nav-item')[3]);
+        activeChatID = [user.email, pEmail].sort().join('_').replace(/\./g, ',');
+        document.getElementById('chat-title').innerText = pName;
+        document.getElementById('chat-window').style.display = 'flex';
+        db.ref('chats/' + activeChatID).on('value', snap => {
+            const box = document.getElementById('chat-box'); box.innerHTML = '';
+            snap.forEach(m => {
+                const d = m.val();
+                const me = d.sender === user.email;
+                box.innerHTML += `<div style="align-self:${me?'flex-end':'flex-start'}; background:${me? 'var(--primary)':'#252b33'}; padding:10px 15px; border-radius:15px; max-width:80%;">${d.text}</div>`;
+            });
+            box.scrollTop = box.scrollHeight;
+        });
+    }
+
+    function closeChat() { document.getElementById('chat-window').style.display = 'none'; }
+
+    function sendMsg() {
+        const i = document.getElementById('chat-input');
+        if(!i.value || !activeChatID) return;
+        db.ref('chats/' + activeChatID).push({ sender: user.email, text: i.value, time: Date.now() });
+        i.value = '';
+    }
+
+    function renderChatList() {
+        if(!user) return;
+        db.ref('chats').once('value', snap => {
+            const list = document.getElementById('chatListContainer'); list.innerHTML = '';
+            snap.forEach(c => {
+                if(c.key.includes(user.email.replace(/\./g, ','))) {
+                    const p = c.key.split('_').find(x => x !== user.email.replace(/\./g, ',')).replace(/,/g,'.');
+                    list.innerHTML += `<div class="ad-card" onclick="openChat('${p}', 'Rozmowa')"><b>Rozmowa z: ${p}</b></div>`;
+                }
+            });
+        });
+    }
+
     renderAds();
-    if(user) renderProfile();
 </script>
 </body>
 </html>
