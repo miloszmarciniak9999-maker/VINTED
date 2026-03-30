@@ -1,404 +1,254 @@
+```html
+<!-- Wklej CAŁOŚĆ jako jeden plik HTML -->
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>EDU CORE PRO</title>
-    
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>EDU CORE PRO</title>
 
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
-        :root {
-            --bg: #0b0e14;
-            --card: #1c2128;
-            --primary: #007aff;
-            --text: #f0f6fc;
-            --sec: #8b949e;
-            --border: rgba(255, 255, 255, 0.08);
-            --danger: #ff453a;
-        }
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
 
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding-bottom: 100px;
-        }
+:root{
+--bg:#0b0e14;
+--card:#1c2128;
+--primary:#007aff;
+--text:#f0f6fc;
+--sec:#8b949e;
+--border:rgba(255,255,255,0.08);
+--danger:#ff453a;
+}
 
-        #toast {
-            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
-            background: var(--primary); color: white; padding: 10px 20px;
-            border-radius: 50px; font-weight: 600; z-index: 9999; font-size: 14px;
-            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-        }
+body{
+font-family:'Plus Jakarta Sans',sans-serif;
+background:var(--bg);
+color:var(--text);
+margin:0;
+padding-bottom:100px;
+}
 
-        .container { padding: 12px; max-width: 480px; margin: 0 auto; }
+.container{padding:12px;max-width:480px;margin:0 auto;}
 
-        select, input, textarea { 
-            width: 100%; padding: 14px; background: #1c2128 !important; 
-            border: 1px solid var(--border) !important;
-            border-radius: 15px; color: white !important; margin-bottom: 10px; 
-            font-size: 14px; outline: none; box-sizing: border-box; font-family: inherit;
-        }
+input,select,textarea{
+width:100%;
+padding:14px;
+background:#1c2128;
+border:1px solid var(--border);
+border-radius:15px;
+color:white;
+margin-bottom:10px;
+box-sizing:border-box;
+}
 
-        select {
-            appearance: none;
-            -webkit-appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%238b949e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
-            background-repeat: no-repeat !important;
-            background-position: right 14px center !important;
-            background-size: 16px !important;
-        }
+.page{display:none;}
+.page.active{display:block;}
 
-        .subject-scroll { display: flex; overflow-x: auto; gap: 8px; margin-bottom: 15px; padding-bottom: 5px; scrollbar-width: none; }
-        .subject-scroll::-webkit-scrollbar { display: none; }
-        
-        .chip {
-            white-space: nowrap; padding: 8px 16px; background: #252b33;
-            border: 1px solid var(--border); border-radius: 50px; font-size: 13px;
-            font-weight: 600; color: var(--sec); cursor: pointer;
-        }
-        .chip.active { background: var(--primary); color: white; border-color: var(--primary); }
+.ad-card{
+background:var(--card);
+border-radius:20px;
+padding:18px;
+margin-bottom:12px;
+border:1px solid var(--border);
+}
 
-        .main-nav-tabs {
-            display: flex; background: rgba(255, 255, 255, 0.03); padding: 4px;
-            border-radius: 15px; margin-bottom: 15px; border: 1px solid var(--border);
-        }
-        .tab-btn {
-            flex: 1; padding: 10px; border: none; border-radius: 12px;
-            background: transparent; color: var(--sec); cursor: pointer; font-weight: 600;
-        }
-        .tab-btn.active { background: var(--primary); color: white; }
+.navbar{
+position:fixed;
+bottom:15px;
+left:50%;
+transform:translateX(-50%);
+width:90%;
+max-width:380px;
+background:rgba(28,33,40,0.95);
+display:flex;
+border-radius:25px;
+border:1px solid var(--border);
+padding:10px 0;
+}
 
-        .ad-card { 
-            background: var(--card); border-radius: 20px; padding: 18px; 
-            margin-bottom: 12px; border: 1px solid var(--border); 
-        }
+.nav-item{
+flex:1;
+text-align:center;
+color:var(--sec);
+cursor:pointer;
+font-size:22px;
+}
 
-        .navbar {
-            position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 380px; background: rgba(28, 33, 40, 0.95);
-            backdrop-filter: blur(15px); display: flex; border-radius: 25px;
-            border: 1px solid var(--border); padding: 10px 0; z-index: 900;
-        }
-        .nav-item { flex: 1; text-align: center; color: var(--sec); cursor: pointer; font-size: 22px; }
-        .nav-item.active { color: var(--primary); }
+.nav-item.active{color:var(--primary);}
 
-        #chat-window {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg); z-index: 2000; display: none; flex-direction: column;
-        }
+#chat-window{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:var(--bg);
+z-index:2000;
+display:none;
+flex-direction:column;
+}
 
-        .btn-action {
-            width: 100%; padding: 14px; border-radius: 14px; border: none; 
-            font-weight: 700; cursor: pointer; font-size: 14px;
-        }
-
-        .page { display: none; }
-        .page.active { display: block; }
-    </style>
+.btn-action{
+width:100%;
+padding:14px;
+border-radius:14px;
+border:none;
+font-weight:700;
+cursor:pointer;
+}
+</style>
 </head>
+
 <body>
 
-<div id="toast">Gotowe!</div>
-
 <div id="chat-window">
-    <div style="padding: 15px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
-        <b id="chat-title">Rozmowa</b>
-        <button onclick="closeChat()" style="background:none; border:none; color:white; font-size: 24px;">✕</button>
-    </div>
-    <div id="chat-box" style="flex:1; overflow-y:auto; padding:15px; display:flex; flex-direction:column; gap:10px;"></div>
-    <div style="padding: 15px; display: flex; gap: 8px;">
-        <input type="text" id="chat-input" placeholder="Wiadomość..." style="margin:0">
-        <button onclick="sendMsg()" style="background:var(--primary); border:none; border-radius:12px; width:50px; color:white;">➔</button>
-    </div>
+<div style="padding:15px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between">
+<b id="chat-title">Rozmowa</b>
+<button onclick="closeChat()" style="background:none;border:none;color:white;font-size:22px">✕</button>
 </div>
 
-<div id="home" class="page active">
-    <div class="container">
-        <div class="main-nav-tabs">
-            <button class="tab-btn active" id="t-tutor" onclick="setHomeView('tutor')">👨‍🏫 Nauczyciele</button>
-            <button class="tab-btn" id="t-student" onclick="setHomeView('student')">🎓 Uczniowie</button>
-        </div>
+<div id="chat-box" style="flex:1;overflow:auto;padding:15px;display:flex;flex-direction:column;gap:10px"></div>
 
-        <input type="text" id="filterSearch" placeholder="🔍 Szukaj przedmiotu..." oninput="renderAds()">
-        
-        <div class="subject-scroll">
-            <div class="chip active" onclick="filterBySub(this, 'all')">Wszystkie</div>
-            <div class="chip" onclick="filterBySub(this, 'Angielski')">🇬🇧 Angielski</div>
-            <div class="chip" onclick="filterBySub(this, 'Matematyka')">🔢 Matematyka</div>
-            <div class="chip" onclick="filterBySub(this, 'Polski')">🇵🇱 Polski</div>
-            <div class="chip" onclick="filterBySub(this, 'Fizyka')">🧪 Fizyka</div>
-        </div>
-
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
-            <select id="filterLevel" onchange="renderAds()">
-                <option value="all">Poziom: Wszystkie</option>
-                <option value="A1">A1</option>
-                <option value="B2">B2</option>
-                <option value="C2">C2</option>
-            </select>
-            <select id="filterType" onchange="renderAds()">
-                <option value="all">Typ: Wszystkie</option>
-                <option value="online">🌐 Zdalnie</option>
-                <option value="live">📍 Na żywo</option>
-            </select>
-        </div>
-        <input type="text" id="filterLoc" placeholder="🏙️ Miasto..." oninput="renderAds()">
-
-        <div id="adsContainer" style="margin-top:10px"></div>
-    </div>
+<div style="padding:15px;display:flex;gap:8px">
+<input id="chat-input" placeholder="Wiadomość...">
+<button onclick="sendMsg()" style="width:50px;background:var(--primary);border:none;border-radius:12px;color:white">➔</button>
+</div>
 </div>
 
-<div id="messages" class="page">
-    <div class="container">
-        <h2>Wiadomości</h2>
-        <div id="chatListContainer"></div>
-    </div>
+<div id="messages" class="page active">
+<div class="container">
+<h2>Wiadomości</h2>
+<div id="chatListContainer"></div>
 </div>
-
-<div id="add" class="page">
-    <div class="container">
-        <h2>Dodaj ogłoszenie</h2>
-        <div class="main-nav-tabs">
-            <button class="tab-btn active" id="a-tutor" onclick="addRole='tutor'; updateAddTabs()">Będę uczyć</button>
-            <button class="tab-btn" id="a-student" onclick="addRole='student'; updateAddTabs()">Szukam lekcji</button>
-        </div>
-
-        <label style="font-size:12px; color:var(--sec); font-weight:700; margin-left:5px;">WYBIERZ PRZEDMIOT</label>
-        <div class="subject-scroll">
-            <div class="chip" onclick="document.getElementById('addSub').value='🇬🇧 Angielski'">🇬🇧 Angielski</div>
-            <div class="chip" onclick="document.getElementById('addSub').value='🔢 Matematyka'">🔢 Matematyka</div>
-            <div class="chip" onclick="document.getElementById('addSub').value='🇵🇱 Polski'">🇵🇱 Polski</div>
-            <div class="chip" onclick="document.getElementById('addSub').value='🧪 Fizyka'">🧪 Fizyka</div>
-        </div>
-        <input type="text" id="addSub" placeholder="Lub wpisz inny przedmiot...">
-
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
-            <input type="number" id="addPrice" placeholder="Cena zł/h">
-            <select id="addLevel">
-                <option value="Dowolny poziom">Dowolny poziom</option>
-                <option value="A1">A1</option>
-                <option value="B2">B2</option>
-                <option value="C2">C2</option>
-            </select>
-        </div>
-
-        <select id="addType" onchange="document.getElementById('addLocBox').style.display=(this.value==='live'?'block':'none')">
-            <option value="online">Lekcje Zdalne 🌐</option>
-            <option value="live">Lekcje Na żywo 📍</option>
-        </select>
-
-        <div id="addLocBox" style="display:none">
-            <input type="text" id="addLoc" placeholder="W jakim mieście?">
-        </div>
-
-        <textarea id="addDesc" rows="3" placeholder="Opis ogłoszenia..."></textarea>
-        <button onclick="postAd()" class="btn-action" style="background:var(--primary); color:white;">Opublikuj ogłoszenie</button>
-    </div>
-</div>
-
-<div id="profile" class="page">
-    <div class="container">
-        <h2>Twój Profil</h2>
-        <input type="text" id="userName" placeholder="Twoje Imię">
-        <input type="email" id="userEmail" placeholder="Twój E-mail">
-        <button onclick="saveUser()" class="btn-action" style="background:var(--primary); color:white;">Zapisz profil</button>
-    </div>
 </div>
 
 <nav class="navbar">
-    <div class="nav-item active" onclick="nav('home', this)">🏠</div>
-    <div class="nav-item" onclick="nav('messages', this)">💬</div>
-    <div class="nav-item" onclick="nav('add', this)">➕</div>
-    <div class="nav-item" onclick="nav('profile', this)">👤</div>
+<div class="nav-item active" onclick="renderChatList()">💬</div>
 </nav>
 
 <script>
-    // Inicjalizacja Firebase
-    const firebaseConfig = {
-        apiKey: "AIzaSyAbs_Z_Oqy2FrWP3CuGK9w9qjDMYGDhgck",
-        authDomain: "educore-5c9f4.firebaseapp.com",
-        databaseURL: "https://educore-5c9f4-default-rtdb.europe-west1.firebasedatabase.app/",
-        projectId: "educore-5c9f4",
-        storageBucket: "educore-5c9f4.firebasestorage.app",
-        messagingSenderId: "213055938628",
-        appId: "1:213055938628:web:408b3beb4273d4f6f59c11"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+// FIREBASE
+const firebaseConfig={
+apiKey:"AIzaSyAbs_Z_Oqy2FrWP3CuGK9w9qjDMYGDhgck",
+authDomain:"educore-5c9f4.firebaseapp.com",
+databaseURL:"https://educore-5c9f4-default-rtdb.europe-west1.firebasedatabase.app/",
+projectId:"educore-5c9f4",
+storageBucket:"educore-5c9f4.firebasestorage.app",
+messagingSenderId:"213055938628",
+appId:"1:213055938628:web:408b3beb4273d4f6f59c11"
+};
 
-    const ADMIN_EMAIL = "milosz.marciniak9999@gmail.com";
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
 
-    let user = JSON.parse(localStorage.getItem('edu_user'));
-    let currentView = 'tutor';
-    let addRole = 'tutor';
-    let selectedSub = 'all';
-    let activeChatID = null;
+let user=JSON.parse(localStorage.getItem('edu_user')) || {name:"User",email:prompt("Podaj email")};
+localStorage.setItem('edu_user',JSON.stringify(user));
 
-    if(user) {
-        document.getElementById('userName').value = user.name || "";
-        document.getElementById('userEmail').value = user.email || "";
-    }
+let activeChatID=null;
 
-    function cleanEmail(email) { return email ? email.toLowerCase().replace(/\./g, ',') : ""; }
-    function getChatID(e1, e2) { return [cleanEmail(e1), cleanEmail(e2)].sort().join('_'); }
+function cleanEmail(e){return e.toLowerCase().replace(/\./g,',')}
+function getChatID(a,b){return [cleanEmail(a),cleanEmail(b)].sort().join('_')}
 
-    function showToast(m, isError = false) {
-        const t = document.getElementById('toast'); 
-        t.innerText = m; 
-        t.style.background = isError ? "var(--danger)" : "var(--primary)";
-        t.style.top = '25px';
-        setTimeout(() => t.style.top = '-100px', 3000);
-    }
+// CLEAR OLD
+db.ref('chats').remove();
 
-    function nav(id, el) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        el.classList.add('active');
-        if(id === 'home') renderAds();
-        if(id === 'messages') renderChatList();
-    }
+// OPEN CHAT
+function openChat(email,name){
 
-    function setHomeView(v) {
-        currentView = v;
-        document.getElementById('t-tutor').classList.toggle('active', v==='tutor');
-        document.getElementById('t-student').classList.toggle('active', v==='student');
-        renderAds();
-    }
+activeChatID=getChatID(user.email,email);
 
-    function filterBySub(el, s) {
-        document.querySelectorAll('#home .chip').forEach(c => c.classList.remove('active'));
-        el.classList.add('active');
-        selectedSub = s;
-        renderAds();
-    }
+document.getElementById('chat-title').innerText=name;
+document.getElementById('chat-window').style.display='flex';
 
-    function updateAddTabs() {
-        document.getElementById('a-tutor').classList.toggle('active', addRole==='tutor');
-        document.getElementById('a-student').classList.toggle('active', addRole==='student');
-    }
+db.ref('chats/'+activeChatID).off();
 
-    function saveUser() {
-        const n = document.getElementById('userName').value;
-        const e = document.getElementById('userEmail').value;
-        if(n && e) {
-            user = {name: n, email: e.toLowerCase()};
-            localStorage.setItem('edu_user', JSON.stringify(user));
-            showToast("Profil zapisany!");
-            renderAds();
-        } else {
-            showToast("Wypełnij Imię i E-mail!", true);
-        }
-    }
+db.ref('chats/'+activeChatID)
+.orderByChild('time')
+.on('value',snap=>{
 
-    function postAd() {
-        if(!user || !user.email) return nav('profile', document.querySelectorAll('.nav-item')[3]);
-        const sub = document.getElementById('addSub').value;
-        const price = document.getElementById('addPrice').value;
-        if(!sub || !price) return showToast("Wpisz przedmiot i cenę!", true);
-        
-        db.ref('ads').push({
-            sub: sub, price: price, level: document.getElementById('addLevel').value,
-            type: document.getElementById('addType').value, loc: document.getElementById('addLoc').value || "",
-            desc: document.getElementById('addDesc').value, role: addRole, 
-            owner: user.name, email: user.email, time: Date.now()
-        }).then(() => {
-            showToast("Ogłoszenie dodane!");
-            nav('home', document.querySelectorAll('.nav-item')[0]);
-        });
-    }
+const box=document.getElementById('chat-box');
+box.innerHTML='';
 
-    function renderAds() {
-        const search = document.getElementById('filterSearch').value.toLowerCase();
-        const levelF = document.getElementById('filterLevel').value;
-        const typeF = document.getElementById('filterType').value;
-        const locF = document.getElementById('filterLoc').value.toLowerCase();
+snap.forEach(m=>{
+const d=m.val();
+const me=d.sender===user.email;
 
-        db.ref('ads').on('value', snap => {
-            const cont = document.getElementById('adsContainer'); cont.innerHTML = '';
-            snap.forEach(c => {
-                const a = c.val();
-                if(a.role !== currentView) return;
-                if(selectedSub !== 'all' && !a.sub.includes(selectedSub)) return;
-                if(search && !a.sub.toLowerCase().includes(search)) return;
-                if(levelF !== 'all' && a.level !== levelF) return;
-                if(typeF !== 'all' && a.type !== typeF) return;
-                if(locF && !a.loc.toLowerCase().includes(locF)) return;
+box.innerHTML+=`
+<div onclick="deleteMsg('${m.key}')"
+style="
+align-self:${me?'flex-end':'flex-start'};
+background:${me?'#007aff':'#252b33'};
+padding:10px;
+border-radius:12px;
+max-width:80%">
+${d.text}
+</div>`;
+});
 
-                const isMe = user && user.email === a.email;
-                const isAdmin = user && user.email === ADMIN_EMAIL;
+box.scrollTop=box.scrollHeight;
+});
+}
 
-                cont.innerHTML += `
-                    <div class="ad-card">
-                        <div style="display:flex; justify-content:space-between;">
-                            <small style="color:var(--primary); font-weight:800;">${a.level.toUpperCase()} • ${a.type==='online'?'ZDALNIE':a.loc.toUpperCase()}</small>
-                            <b style="font-size:16px;">${a.price} zł/h</b>
-                        </div>
-                        <h3 style="margin:5px 0; font-size:17px;">${a.sub}</h3>
-                        <p style="color:var(--sec); font-size:13px; margin-bottom:12px;">${a.desc}</p>
-                        ${isMe || isAdmin ? `<button onclick="db.ref('ads').child('${c.key}').remove()" class="btn-action" style="background:rgba(255,69,58,0.1); color:var(--danger); margin-bottom: 8px;">Usuń ogłoszenie</button>` : ''}
-                        ${!isMe ? `<button onclick="openChat('${a.email}','${a.owner}')" class="btn-action" style="background:var(--primary); color:white;">Napisz wiadomość</button>` : ''}
-                    </div>`;
-            });
-        });
-    }
+// SEND
+function sendMsg(){
+const i=document.getElementById('chat-input');
+if(!i.value.trim()) return;
 
-    function openChat(targetEmail, targetName) {
-        if(!user || !user.email) return nav('profile', document.querySelectorAll('.nav-item')[3]);
-        activeChatID = getChatID(user.email, targetEmail);
-        document.getElementById('chat-title').innerText = "Rozmowa: " + targetName;
-        document.getElementById('chat-window').style.display = 'flex';
-        
-        db.ref('chats/' + activeChatID).on('value', snap => {
-            const box = document.getElementById('chat-box'); box.innerHTML = '';
-            snap.forEach(m => {
-                const d = m.val();
-                const me = d.sender === user.email;
-                box.innerHTML += `
-                <div style="align-self:${me?'flex-end':'flex-start'}; background:${me? 'var(--primary)':'#252b33'}; padding:10px; border-radius:12px; max-width:80%; font-size:14px;">
-                    ${d.text}
-                </div>`;
-            });
-            box.scrollTop = box.scrollHeight;
-        });
-    }
+db.ref('chats/'+activeChatID).push({
+sender:user.email,
+text:i.value.trim(),
+time:Date.now()
+});
 
-    function sendMsg() {
-        const i = document.getElementById('chat-input');
-        if(!i.value || !activeChatID) return;
-        db.ref('chats/' + activeChatID).push({ sender: user.email, text: i.value, time: Date.now() });
-        i.value = '';
-    }
+i.value='';
+}
 
-    function closeChat() { document.getElementById('chat-window').style.display = 'none'; }
+// ENTER
+document.getElementById('chat-input').addEventListener('keypress',e=>{
+if(e.key==='Enter') sendMsg();
+});
 
-    function renderChatList() {
-        if(!user || !user.email) return;
-        const myClean = cleanEmail(user.email);
-        db.ref('chats').on('value', snap => {
-            const list = document.getElementById('chatListContainer'); list.innerHTML = '';
-            let found = false;
-            snap.forEach(c => {
-                if(c.key.includes(myClean) || user.email === ADMIN_EMAIL) {
-                    found = true;
-                    const parts = c.key.split('_');
-                    const partnerClean = parts.find(p => p !== myClean) || parts[0];
-                    const partnerEmail = partnerClean.replace(/,/g, '.');
-                    list.innerHTML += `<div class="ad-card" onclick="openChat('${partnerEmail}', '${partnerEmail}')"><b>💬 Rozmowa z: ${partnerEmail}</b></div>`;
-                }
-            });
-            if(!found) list.innerHTML = '<p style="color:var(--sec); text-align:center;">Brak wiadomości.</p>';
-        });
-    }
+// DELETE
+function deleteMsg(id){
+db.ref('chats/'+activeChatID+'/'+id).remove();
+}
 
-    renderAds();
+// CLOSE
+function closeChat(){
+if(activeChatID) db.ref('chats/'+activeChatID).off();
+document.getElementById('chat-window').style.display='none';
+}
+
+// LIST
+function renderChatList(){
+
+const my=cleanEmail(user.email);
+
+db.ref('chats').on('value',snap=>{
+
+const list=document.getElementById('chatListContainer');
+list.innerHTML='';
+
+snap.forEach(c=>{
+if(!c.key.includes(my)) return;
+
+const parts=c.key.split('_');
+const partner=parts.find(p=>p!==my).replace(/,/g,'.');
+
+list.innerHTML+=`
+<div class="ad-card" onclick="openChat('${partner}','${partner}')">
+💬 ${partner}
+</div>`;
+});
+});
+}
+
+renderChatList();
 </script>
+
 </body>
 </html>
+```
