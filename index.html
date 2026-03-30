@@ -4,75 +4,165 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>EDU CORE PRO</title>
+    
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+
         :root {
-            --bg: #0b0e14; --card: #1c2128; --primary: #007aff; --text: #f0f6fc;
-            --sec: #8b949e; --border: rgba(255, 255, 255, 0.08); --danger: #ff453a;
+            --bg: #0b0e14;
+            --card: #1c2128;
+            --primary: #007aff;
+            --text: #f0f6fc;
+            --sec: #8b949e;
+            --border: rgba(255, 255, 255, 0.08);
+            --danger: #ff453a;
         }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding-bottom: 100px; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding-bottom: 100px;
+        }
+
+        #toast {
+            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+            background: var(--primary); color: white; padding: 10px 20px;
+            border-radius: 50px; font-weight: 600; z-index: 9999; font-size: 14px;
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
         .container { padding: 12px; max-width: 480px; margin: 0 auto; }
-        
-        /* FIX WYGLĄDU - Usunięcie kresek/strzałek */
+
+        /* --- INPUTY & SELECTY (Z NAPRAWIONYMI STRZAŁKAMI) --- */
         select, input, textarea { 
-            width: 100%; padding: 14px; background: #1c2128; border: 1px solid var(--border);
-            border-radius: 15px; color: white; margin-bottom: 10px; font-size: 14px; outline: none;
+            width: 100%; padding: 14px; background: #1c2128 !important; 
+            border: 1px solid var(--border) !important;
+            border-radius: 15px; color: white !important; margin-bottom: 10px; 
+            font-size: 14px; outline: none; box-sizing: border-box; font-family: inherit;
         }
-        
+
+        select {
+            appearance: none; /* USUWA SYSTEMOWE STRZAŁKI/KRESKI */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%238b949e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 14px center !important;
+            background-size: 16px !important;
+        }
+
+        /* --- CHIPS & TABS --- */
         .subject-scroll { display: flex; overflow-x: auto; gap: 8px; margin-bottom: 15px; padding-bottom: 5px; scrollbar-width: none; }
-        .chip { white-space: nowrap; padding: 8px 16px; background: #252b33; border: 1px solid var(--border); border-radius: 50px; font-size: 13px; cursor: pointer; }
-        .chip.active { background: var(--primary); color: white; }
+        .subject-scroll::-webkit-scrollbar { display: none; }
         
-        .main-nav-tabs { display: flex; background: rgba(255, 255, 255, 0.03); padding: 4px; border-radius: 15px; margin-bottom: 15px; border: 1px solid var(--border); }
-        .tab-btn { flex: 1; padding: 10px; border: none; border-radius: 12px; background: transparent; color: var(--sec); cursor: pointer; }
+        .chip {
+            white-space: nowrap; padding: 8px 16px; background: #252b33;
+            border: 1px solid var(--border); border-radius: 50px; font-size: 13px;
+            font-weight: 600; color: var(--sec); cursor: pointer;
+        }
+        .chip.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        .main-nav-tabs {
+            display: flex; background: rgba(255, 255, 255, 0.03); padding: 4px;
+            border-radius: 15px; margin-bottom: 15px; border: 1px solid var(--border);
+        }
+        .tab-btn {
+            flex: 1; padding: 10px; border: none; border-radius: 12px;
+            background: transparent; color: var(--sec); cursor: pointer; font-weight: 600;
+        }
         .tab-btn.active { background: var(--primary); color: white; }
-        
-        .ad-card { background: var(--card); border-radius: 20px; padding: 18px; margin-bottom: 12px; border: 1px solid var(--border); }
-        .navbar { position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 380px; background: rgba(28, 33, 40, 0.95); backdrop-filter: blur(15px); display: flex; border-radius: 25px; border: 1px solid var(--border); padding: 10px 0; z-index: 900; }
+
+        /* --- KARTY --- */
+        .ad-card { 
+            background: var(--card); border-radius: 20px; padding: 18px; 
+            margin-bottom: 12px; border: 1px solid var(--border); 
+        }
+
+        .navbar {
+            position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 380px; background: rgba(28, 33, 40, 0.95);
+            backdrop-filter: blur(15px); display: flex; border-radius: 25px;
+            border: 1px solid var(--border); padding: 10px 0; z-index: 900;
+        }
         .nav-item { flex: 1; text-align: center; color: var(--sec); cursor: pointer; font-size: 22px; }
         .nav-item.active { color: var(--primary); }
 
-        #chat-window { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 2000; display: none; flex-direction: column; }
-        .msg { padding: 10px; border-radius: 12px; max-width: 80%; font-size: 14px; margin-bottom: 5px; position: relative; }
-        .msg-me { align-self: flex-end; background: var(--primary); color: white; }
-        .msg-them { align-self: flex-start; background: #252b33; color: white; }
-        
-        #toast { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background: var(--danger); color: white; padding: 10px 20px; border-radius: 50px; z-index: 9999; transition: 0.5s; }
+        #chat-window {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg); z-index: 2000; display: none; flex-direction: column;
+        }
+
+        .btn-action {
+            width: 100%; padding: 14px; border-radius: 14px; border: none; 
+            font-weight: 700; cursor: pointer; font-size: 14px;
+        }
+
+        /* KLUCZOWE DLA NAWIGACJI STRON - NIE USUWAJ! */
+        .page { display: none; }
+        .page.active { display: block; }
     </style>
 </head>
 <body>
 
-<div id="toast">Musisz się zalogować!</div>
+<div id="toast">Gotowe!</div>
 
 <div id="chat-window">
-    <div style="padding: 15px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;">
-        <b id="chat-title">Czat</b>
+    <div style="padding: 15px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+        <b id="chat-title">Rozmowa</b>
         <button onclick="closeChat()" style="background:none; border:none; color:white; font-size: 24px;">✕</button>
     </div>
-    <div id="chat-box" style="flex:1; overflow-y:auto; padding:15px; display:flex; flex-direction:column;"></div>
+    <div id="chat-box" style="flex:1; overflow-y:auto; padding:15px; display:flex; flex-direction:column; gap:10px;"></div>
     <div style="padding: 15px; display: flex; gap: 8px;">
         <input type="text" id="chat-input" placeholder="Wiadomość..." style="margin:0">
-        <button onclick="sendMsg()" style="background:var(--primary); border:none; border-radius:12px; padding:0 20px; color:white;">➔</button>
+        <button onclick="sendMsg()" style="background:var(--primary); border:none; border-radius:12px; width:50px; color:white;">➔</button>
     </div>
 </div>
 
 <div id="home" class="page active">
     <div class="container">
         <div class="main-nav-tabs">
-            <button class="tab-btn active" onclick="setHomeView('tutor', this)">Nauczyciele</button>
-            <button class="tab-btn" onclick="setHomeView('student', this)">Uczniowie</button>
+            <button class="tab-btn active" id="t-tutor" onclick="setHomeView('tutor')">👨‍🏫 Nauczyciele</button>
+            <button class="tab-btn" id="t-student" onclick="setHomeView('student')">🎓 Uczniowie</button>
         </div>
-        <input type="text" id="filterSearch" placeholder="🔍 Szukaj..." oninput="renderAds()">
-        <div id="adsContainer"></div>
+
+        <input type="text" id="filterSearch" placeholder="🔍 Szukaj przedmiotu..." oninput="renderAds()">
+        
+        <div class="subject-scroll">
+            <div class="chip active" onclick="filterBySub(this, 'all')">Wszystkie</div>
+            <div class="chip" onclick="filterBySub(this, 'Angielski')">🇬🇧 Angielski</div>
+            <div class="chip" onclick="filterBySub(this, 'Matematyka')">🔢 Matematyka</div>
+            <div class="chip" onclick="filterBySub(this, 'Polski')">🇵🇱 Polski</div>
+            <div class="chip" onclick="filterBySub(this, 'Fizyka')">🧪 Fizyka</div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
+            <select id="filterLevel" onchange="renderAds()">
+                <option value="all">Poziom: Wszystkie</option>
+                <option value="A1">A1</option>
+                <option value="B2">B2</option>
+                <option value="C2">C2</option>
+            </select>
+            <select id="filterType" onchange="renderAds()">
+                <option value="all">Typ: Wszystkie</option>
+                <option value="online">🌐 Zdalnie</option>
+                <option value="live">📍 Na żywo</option>
+            </select>
+        </div>
+        <input type="text" id="filterLoc" placeholder="🏙️ Miasto..." oninput="renderAds()">
+
+        <div id="adsContainer" style="margin-top:10px"></div>
     </div>
 </div>
 
 <div id="messages" class="page">
     <div class="container">
-        <h2>Twoje rozmowy</h2>
+        <h2>Wiadomości</h2>
         <div id="chatListContainer"></div>
     </div>
 </div>
@@ -81,27 +171,49 @@
     <div class="container">
         <h2>Dodaj ogłoszenie</h2>
         <div class="main-nav-tabs">
-            <button class="tab-btn active" onclick="addRole='tutor'; updateAddTabs(this)">Będę uczyć</button>
-            <button class="tab-btn" onclick="addRole='student'; updateAddTabs(this)">Szukam lekcji</button>
+            <button class="tab-btn active" id="a-tutor" onclick="addRole='tutor'; updateAddTabs()">Będę uczyć</button>
+            <button class="tab-btn" id="a-student" onclick="addRole='student'; updateAddTabs()">Szukam lekcji</button>
         </div>
-        <input type="text" id="addSub" placeholder="Przedmiot">
-        <input type="number" id="addPrice" placeholder="Cena zł/h">
-        <select id="addLevel">
-            <option value="Podstawowy">Podstawowy</option>
-            <option value="Średni">Średni</option>
-            <option value="Zaawansowany">Zaawansowany</option>
+
+        <label style="font-size:12px; color:var(--sec); font-weight:700; margin-left:5px;">WYBIERZ PRZEDMIOT</label>
+        <div class="subject-scroll">
+            <div class="chip" onclick="document.getElementById('addSub').value='🇬🇧 Angielski'">🇬🇧 Angielski</div>
+            <div class="chip" onclick="document.getElementById('addSub').value='🔢 Matematyka'">🔢 Matematyka</div>
+            <div class="chip" onclick="document.getElementById('addSub').value='🇵🇱 Polski'">🇵🇱 Polski</div>
+            <div class="chip" onclick="document.getElementById('addSub').value='🧪 Fizyka'">🧪 Fizyka</div>
+        </div>
+        <input type="text" id="addSub" placeholder="Lub wpisz inny przedmiot...">
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
+            <input type="number" id="addPrice" placeholder="Cena zł/h">
+            <select id="addLevel">
+                <option value="Dowolny poziom">Dowolny poziom</option>
+                <option value="A1">A1</option>
+                <option value="B2">B2</option>
+                <option value="C2">C2</option>
+            </select>
+        </div>
+
+        <select id="addType" onchange="document.getElementById('addLocBox').style.display=(this.value==='live'?'block':'none')">
+            <option value="online">Lekcje Zdalne 🌐</option>
+            <option value="live">Lekcje Na żywo 📍</option>
         </select>
-        <textarea id="addDesc" rows="3" placeholder="Opis..."></textarea>
-        <button onclick="postAd()" style="width:100%; padding:15px; border-radius:15px; border:none; background:var(--primary); color:white; font-weight:800;">Opublikuj</button>
+
+        <div id="addLocBox" style="display:none">
+            <input type="text" id="addLoc" placeholder="W jakim mieście?">
+        </div>
+
+        <textarea id="addDesc" rows="3" placeholder="Opis ogłoszenia..."></textarea>
+        <button onclick="postAd()" class="btn-action" style="background:var(--primary); color:white;">Opublikuj ogłoszenie</button>
     </div>
 </div>
 
 <div id="profile" class="page">
     <div class="container">
-        <h2>Profil</h2>
-        <input type="text" id="userName" placeholder="Imię">
-        <input type="email" id="userEmail" placeholder="E-mail">
-        <button onclick="saveUser()" style="width:100%; padding:15px; border-radius:15px; background:var(--primary); color:white; border:none;">Zapisz</button>
+        <h2>Twój Profil</h2>
+        <input type="text" id="userName" placeholder="Twoje Imię">
+        <input type="email" id="userEmail" placeholder="Twój E-mail">
+        <button onclick="saveUser()" class="btn-action" style="background:var(--primary); color:white;">Zapisz profil</button>
     </div>
 </div>
 
@@ -113,6 +225,7 @@
 </nav>
 
 <script>
+    // Inicjalizacja Firebase
     const firebaseConfig = {
         apiKey: "AIzaSyAbs_Z_Oqy2FrWP3CuGK9w9qjDMYGDhgck",
         authDomain: "educore-5c9f4.firebaseapp.com",
@@ -124,15 +237,27 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
+
+    // EMAIL ADMINA - MA PEŁNE PRAWA
     const ADMIN_EMAIL = "milosz.marciniak9999@gmail.com";
 
     let user = JSON.parse(localStorage.getItem('edu_user'));
     let currentView = 'tutor';
     let addRole = 'tutor';
+    let selectedSub = 'all';
     let activeChatID = null;
 
-    function showToast(m) {
-        const t = document.getElementById('toast'); t.innerText = m; t.style.top = '25px';
+    // Jeżeli user był zapisany, od razu wpisz go w inputy w profilu
+    if(user) {
+        document.getElementById('userName').value = user.name || "";
+        document.getElementById('userEmail').value = user.email || "";
+    }
+
+    function showToast(m, isError = false) {
+        const t = document.getElementById('toast'); 
+        t.innerText = m; 
+        t.style.background = isError ? "var(--danger)" : "var(--primary)";
+        t.style.top = '25px';
         setTimeout(() => t.style.top = '-100px', 3000);
     }
 
@@ -142,7 +267,33 @@
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         el.classList.add('active');
         if(id === 'home') renderAds();
-        if(id === 'messages') renderChatList();
+        if(id === 'messages') {
+            if(!user || !user.email) {
+                showToast("Zaloguj się, aby zobaczyć wiadomości!", true);
+                nav('profile', document.querySelectorAll('.nav-item')[3]);
+                return;
+            }
+            renderChatList();
+        }
+    }
+
+    function setHomeView(v) {
+        currentView = v;
+        document.getElementById('t-tutor').classList.toggle('active', v==='tutor');
+        document.getElementById('t-student').classList.toggle('active', v==='student');
+        renderAds();
+    }
+
+    function filterBySub(el, s) {
+        document.querySelectorAll('#home .chip').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+        selectedSub = s;
+        renderAds();
+    }
+
+    function updateAddTabs() {
+        document.getElementById('a-tutor').classList.toggle('active', addRole==='tutor');
+        document.getElementById('a-student').classList.toggle('active', addRole==='student');
     }
 
     function saveUser() {
@@ -151,59 +302,112 @@
         if(n && e) {
             user = {name: n, email: e};
             localStorage.setItem('edu_user', JSON.stringify(user));
-            showToast("Zapisano!");
+            showToast("Profil zapisany!");
+            renderAds(); // Odśwież widoki, żeby zastosować ew. prawa admina
+        } else {
+            showToast("Wypełnij Imię i E-mail!", true);
         }
     }
 
     function postAd() {
-        if(!user) return showToast("Musisz uzupełnić profil (E-mail), aby dodać ogłoszenie!");
+        if(!user || !user.email) {
+            showToast("Musisz uzupełnić profil, aby dodać post!", true);
+            nav('profile', document.querySelectorAll('.nav-item')[3]);
+            return;
+        }
+
+        const sub = document.getElementById('addSub').value;
+        const price = document.getElementById('addPrice').value;
+        if(!sub || !price) return showToast("Wpisz przedmiot i cenę!", true);
+        
         db.ref('ads').push({
-            sub: document.getElementById('addSub').value,
-            price: document.getElementById('addPrice').value,
+            sub: sub,
+            price: price,
             level: document.getElementById('addLevel').value,
+            type: document.getElementById('addType').value,
+            loc: document.getElementById('addLoc').value || "",
             desc: document.getElementById('addDesc').value,
             role: addRole, owner: user.name, email: user.email, time: Date.now()
-        }).then(() => { showToast("Dodano!"); nav('home', document.querySelectorAll('.nav-item')[0]); });
+        }).then(() => {
+            showToast("Ogłoszenie dodane!");
+            document.getElementById('addSub').value = '';
+            document.getElementById('addPrice').value = '';
+            document.getElementById('addDesc').value = '';
+            nav('home', document.querySelectorAll('.nav-item')[0]);
+        });
     }
 
     function renderAds() {
+        const search = document.getElementById('filterSearch').value.toLowerCase();
+        const levelF = document.getElementById('filterLevel').value;
+        const typeF = document.getElementById('filterType').value;
+        const locF = document.getElementById('filterLoc').value.toLowerCase();
+
         db.ref('ads').on('value', snap => {
             const cont = document.getElementById('adsContainer'); cont.innerHTML = '';
             snap.forEach(c => {
                 const a = c.val();
                 if(a.role !== currentView) return;
-                const isOwner = user && (user.email === a.email || user.email === ADMIN_EMAIL);
+                if(selectedSub !== 'all' && !a.sub.includes(selectedSub)) return;
+                if(search && !a.sub.toLowerCase().includes(search)) return;
+                if(levelF !== 'all' && a.level !== levelF) return;
+                if(typeF !== 'all' && a.type !== typeF) return;
+                if(locF && !a.loc.toLowerCase().includes(locF)) return;
+
+                // Logika usuwania (tylko właściciel posta LUB Admin)
+                const isMe = user && user.email === a.email;
+                const isAdmin = user && user.email === ADMIN_EMAIL;
+                const canDelete = isMe || isAdmin;
+
                 cont.innerHTML += `
                     <div class="ad-card">
-                        <b>${a.sub}</b> - ${a.price} zł/h<br><small>${a.desc}</small><br>
-                        ${isOwner ? `<button onclick="db.ref('ads').child('${c.key}').remove()" style="color:red; background:none; border:none; padding:5px 0; cursor:pointer;">Usuń ogłoszenie</button>` : 
-                        `<button onclick="openChat('${a.email}','${a.owner}')" style="width:100%; margin-top:10px; padding:10px; border-radius:10px; border:none; background:var(--primary); color:white;">Napisz wiadomość</button>`}
+                        <div style="display:flex; justify-content:space-between;">
+                            <small style="color:var(--primary); font-weight:800;">${a.level.toUpperCase()} • ${a.type==='online'?'ZDALNIE':a.loc.toUpperCase()}</small>
+                            <b style="font-size:16px;">${a.price} zł/h</b>
+                        </div>
+                        <h3 style="margin:5px 0; font-size:17px;">${a.sub}</h3>
+                        <p style="color:var(--sec); font-size:13px; margin-bottom:12px;">${a.desc}</p>
+                        ${canDelete ? 
+                        `<button onclick="db.ref('ads').child('${c.key}').remove()" class="btn-action" style="background:rgba(255,69,58,0.1); color:var(--danger); margin-bottom: 8px;">Usuń ogłoszenie</button>` : ''}
+                        
+                        ${!isMe ? `<button onclick="openChat('${a.email}','${a.owner}')" class="btn-action" style="background:var(--primary); color:white;">Napisz wiadomość</button>` : ''}
                     </div>`;
             });
         });
     }
 
+    // --- CZAT ---
     function openChat(pEmail, pName) {
-        if(!user) return showToast("Zaloguj się, aby pisać wiadomości!");
+        if(!user || !user.email) {
+            showToast("Zaloguj się, aby pisać wiadomości!", true);
+            nav('profile', document.querySelectorAll('.nav-item')[3]);
+            return;
+        }
+
         activeChatID = [user.email, pEmail].sort().join('_').replace(/\./g, ',');
-        document.getElementById('chat-title').innerText = "Rozmowa z: " + pName;
+        document.getElementById('chat-title').innerText = "Rozmowa: " + pName;
         document.getElementById('chat-window').style.display = 'flex';
+        
+        // Czat w czasie rzeczywistym i trwale zapisywany w Firebase
         db.ref('chats/' + activeChatID).on('value', snap => {
             const box = document.getElementById('chat-box'); box.innerHTML = '';
             snap.forEach(m => {
                 const d = m.val();
-                const isMe = d.sender === user.email;
-                const canDelete = user.email === ADMIN_EMAIL;
+                const me = d.sender === user.email;
+                const isAdmin = user && user.email === ADMIN_EMAIL;
+
                 box.innerHTML += `
-                    <div class="msg ${isMe?'msg-me':'msg-them'}">
-                        ${d.text}
-                        ${canDelete ? `<div onclick="db.ref('chats/${activeChatID}/${m.key}').remove()" style="font-size:10px; color:red; cursor:pointer;">Usuń</div>` : ''}
-                    </div>`;
+                <div style="align-self:${me?'flex-end':'flex-start'}; background:${me? 'var(--primary)':'#252b33'}; padding:10px; border-radius:12px; max-width:80%; font-size:14px; margin-bottom:5px;">
+                    ${d.text}
+                    ${isAdmin ? `<br><span onclick="db.ref('chats/${activeChatID}/${m.key}').remove()" style="font-size:11px; color:var(--danger); cursor:pointer; font-weight:800; display:block; margin-top:5px;">🗑 Usuń</span>` : ''}
+                </div>`;
             });
             box.scrollTop = box.scrollHeight;
         });
     }
 
+    function closeChat() { document.getElementById('chat-window').style.display = 'none'; }
+    
     function sendMsg() {
         const i = document.getElementById('chat-input');
         if(!i.value || !activeChatID) return;
@@ -212,22 +416,23 @@
     }
 
     function renderChatList() {
-        if(!user) return;
+        if(!user || !user.email) return;
+        const isAdmin = user.email === ADMIN_EMAIL;
+
         db.ref('chats').on('value', snap => {
             const list = document.getElementById('chatListContainer'); list.innerHTML = '';
             snap.forEach(c => {
-                // PRYWATNOŚĆ: Tylko Twoje rozmowy lub Admin widzi wszystko
-                if(c.key.includes(user.email.replace(/\./g, ',')) || user.email === ADMIN_EMAIL) {
+                // WAŻNE: WIDZISZ TYLKO SWOJE ROZMOWY. Admin widzi wszystko.
+                if(c.key.includes(user.email.replace(/\./g, ',')) || isAdmin) {
                     const p = c.key.split('_').find(x => x !== user.email.replace(/\./g, ',')).replace(/,/g,'.');
-                    list.innerHTML += `<div class="ad-card" onclick="openChat('${p}', '${p}')">Rozmowa z: ${p}</div>`;
+                    list.innerHTML += `<div class="ad-card" onclick="openChat('${p}', '${p}')"><b>Czat z: ${p}</b></div>`;
                 }
             });
+            if(list.innerHTML === '') {
+                list.innerHTML = '<p style="color:var(--sec); text-align:center;">Brak wiadomości.</p>';
+            }
         });
     }
-
-    function closeChat() { document.getElementById('chat-window').style.display = 'none'; }
-    function setHomeView(v, el) { currentView = v; document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); el.classList.add('active'); renderAds(); }
-    function updateAddTabs(el) { document.querySelectorAll('#add .tab-btn').forEach(b => b.classList.remove('active')); el.classList.add('active'); }
 
     renderAds();
 </script>
