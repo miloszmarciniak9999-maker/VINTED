@@ -57,7 +57,6 @@
         }
         .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 8px 20px rgba(0, 122, 255, 0.3); }
 
-        /* --- FILTRY --- */
         .filter-section {
             background: var(--card); padding: 20px; border-radius: 24px;
             margin-bottom: 25px; border: 1px solid var(--border);
@@ -76,34 +75,18 @@
         }
         .chip.active { background: var(--primary); color: white; border-color: var(--primary); }
 
-        /* --- WYSZUKIWARKA MIEJSCOWOŚCI --- */
-        #locationSearchWrapper {
-            margin-top: 12px;
-            display: none; /* Pokazywane tylko dla "Na żywo" */
-            animation: slideDown 0.3s ease;
-        }
-
+        #locationSearchWrapper { margin-top: 12px; display: none; animation: slideDown 0.3s ease; }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .ad-card {
-            background: var(--card); border-radius: 28px; padding: 24px;
-            margin-bottom: 20px; border: 1px solid var(--border);
-        }
-
+        .ad-card { background: var(--card); border-radius: 28px; padding: 24px; margin-bottom: 20px; border: 1px solid var(--border); }
         .price-tag { font-size: 22px; font-weight: 800; color: white; margin: 15px 0; }
         .price-tag span { font-size: 14px; color: var(--sec); font-weight: 400; }
 
         .badge-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
-        .badge {
-            padding: 5px 12px; background: rgba(88, 166, 255, 0.1);
-            color: var(--accent); border-radius: 10px; font-size: 11px; font-weight: 700;
-        }
+        .badge { padding: 5px 12px; background: rgba(88, 166, 255, 0.1); color: var(--accent); border-radius: 10px; font-size: 11px; font-weight: 700; }
         .badge.loc { background: rgba(34, 197, 94, 0.1); color: #4ade80; }
 
-        .btn-main {
-            width: 100%; padding: 18px; border: none; border-radius: 20px;
-            background: var(--grad); color: white; font-weight: 700; font-size: 16px;
-        }
+        .btn-main { width: 100%; padding: 18px; border: none; border-radius: 20px; background: var(--grad); color: white; font-weight: 700; font-size: 16px; cursor: pointer; }
 
         .navbar {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
@@ -111,7 +94,7 @@
             backdrop-filter: blur(20px); display: flex; border-radius: 30px;
             border: 1px solid var(--border); padding: 12px 0; z-index: 900;
         }
-        .nav-item { flex: 1; text-align: center; color: var(--sec); }
+        .nav-item { flex: 1; text-align: center; color: var(--sec); cursor: pointer; }
         .nav-item.active { color: var(--primary); }
         .nav-icon { font-size: 22px; display: block; }
 
@@ -136,33 +119,23 @@
         </div>
 
         <div class="filter-section">
-            <input type="text" id="filterSearch" placeholder="🔍 Szukaj przedmiotu (np. Matematyka)..." oninput="renderAds()">
-            
+            <input type="text" id="filterSearch" placeholder="🔍 Szukaj przedmiotu..." oninput="renderAds()">
             <div class="subject-scroll">
                 <div class="chip active" onclick="filterBySub(this, 'all')">Wszystkie</div>
                 <div class="chip" onclick="filterBySub(this, 'Angielski')">🇬🇧 Angielski</div>
                 <div class="chip" onclick="filterBySub(this, 'Matematyka')">🔢 Matematyka</div>
                 <div class="chip" onclick="filterBySub(this, 'Polski')">🇵🇱 Polski</div>
-                <div class="chip" onclick="filterBySub(this, 'Fizyka')">🧪 Fizyka</div>
             </div>
-
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px">
                 <select id="filterLevel" onchange="renderAds()">
-                    <option value="all">Każdy poziom</option>
-                    <option value="A1">A1</option><option value="B2">B2</option><option value="C2">C2</option>
+                    <option value="all">Poziom</option><option value="A1">A1</option><option value="B2">B2</option><option value="C2">C2</option>
                 </select>
                 <select id="filterType" onchange="handleTypeChange()">
-                    <option value="all">Zdalnie / Live</option>
-                    <option value="online">🌐 Tylko Zdalnie</option>
-                    <option value="live">📍 Na żywo</option>
+                    <option value="all">Typ lekcji</option><option value="online">🌐 Zdalnie</option><option value="live">📍 Na żywo</option>
                 </select>
             </div>
-
-            <div id="locationSearchWrapper">
-                <input type="text" id="filterLoc" placeholder="🏙️ Wpisz miasto (np. Warszawa)..." oninput="renderAds()">
-            </div>
+            <div id="locationSearchWrapper"><input type="text" id="filterLoc" placeholder="🏙️ Wpisz miasto..." oninput="renderAds()"></div>
         </div>
-
         <div id="adsContainer"></div>
     </div>
 </div>
@@ -171,8 +144,8 @@
     <div class="container">
         <h2 style="font-weight: 800;">Nowe ogłoszenie</h2>
         <div class="main-nav-tabs">
-            <button class="tab-btn active" onclick="setAddMode('tutor')">Będę uczyć</button>
-            <button class="tab-btn" onclick="setAddMode('student')">Szukam lekcji</button>
+            <button class="tab-btn active" id="addBtnTutor" onclick="setAddMode('tutor')">Będę uczyć</button>
+            <button class="tab-btn" id="addBtnStudent" onclick="setAddMode('student')">Szukam lekcji</button>
         </div>
         <input type="text" id="addSub" placeholder="Przedmiot (np. 🇬🇧 Angielski)">
         <input type="number" id="addPrice" placeholder="Cena (zł / h)">
@@ -182,7 +155,16 @@
         </select>
         <input type="text" id="addLoc" placeholder="W jakim mieście?" style="display:none">
         <textarea id="addDesc" rows="4" placeholder="Opisz ofertę..."></textarea>
-        <button class="btn-main" onclick="postAd()">Opublikuj</button>
+        <button class="btn-main" onclick="postAd()">Opublikuj ogłoszenie</button>
+    </div>
+</div>
+
+<div id="profile" class="page">
+    <div class="container" id="profileBox">
+        <h2 style="font-weight: 800;">Twój Profil</h2>
+        <input type="text" id="userName" placeholder="Twoje Imię / Nick">
+        <input type="email" id="userEmail" placeholder="Twój E-mail">
+        <button class="btn-main" onclick="saveUser()">Zapisz i aktywuj</button>
     </div>
 </div>
 
@@ -207,8 +189,21 @@
     
     let user = JSON.parse(localStorage.getItem('edu_user'));
     let homeView = 'tutor';
-    let addMode = 'tutor';
+    let addMode = 'tutor'; // To teraz działa poprawnie!
     let selectedChipSub = 'all';
+
+    function setAddMode(mode) {
+        addMode = mode;
+        document.getElementById('addBtnTutor').classList.toggle('active', mode === 'tutor');
+        document.getElementById('addBtnStudent').classList.toggle('active', mode === 'student');
+    }
+
+    function toggleHomeView(v) {
+        homeView = v;
+        document.getElementById('viewTutors').classList.toggle('active', v === 'tutor');
+        document.getElementById('viewStudents').classList.toggle('active', v === 'student');
+        renderAds();
+    }
 
     function handleTypeChange() {
         const type = document.getElementById('filterType').value;
@@ -227,32 +222,57 @@
         renderAds();
     }
 
-    function toggleHomeView(v) {
-        homeView = v;
-        document.getElementById('viewTutors').classList.toggle('active', v === 'tutor');
-        document.getElementById('viewStudents').classList.toggle('active', v === 'student');
-        renderAds();
-    }
-
     function nav(id, el) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         el.classList.add('active');
+        if(id === 'home') renderAds();
+        if(id === 'profile') renderProfile();
+    }
+
+    function saveUser() {
+        const name = document.getElementById('userName').value;
+        const email = document.getElementById('userEmail').value;
+        if(name && email) {
+            user = {name, email};
+            localStorage.setItem('edu_user', JSON.stringify(user));
+            alert("Profil zapisany!");
+            location.reload();
+        } else { alert("Wypełnij dane!"); }
+    }
+
+    function renderProfile() {
+        if(user) {
+            document.getElementById('profileBox').innerHTML = `
+                <div style="text-align:center; padding: 20px;">
+                    <div style="font-size: 50px;">👤</div>
+                    <h2 style="margin:10px 0;">Witaj, ${user.name}!</h2>
+                    <p style="color:var(--sec);">${user.email}</p>
+                    <button class="btn-main" style="background:#ef4444; margin-top:20px;" onclick="localStorage.clear(); location.reload();">Wyloguj się</button>
+                </div>`;
+        }
     }
 
     function postAd() {
-        if(!user) return alert("Zaloguj się w profilu!");
+        if(!user) { alert("Musisz najpierw uzupełnić Profil (ikona ludzika)!"); return; }
+        const sub = document.getElementById('addSub').value;
+        const price = document.getElementById('addPrice').value;
+        if(!sub || !price) { alert("Podaj przedmiot i cenę!"); return; }
+
         db.ref('ads').push({
-            sub: document.getElementById('addSub').value,
-            price: document.getElementById('addPrice').value,
+            sub, price,
             type: document.getElementById('addType').value,
-            loc: document.getElementById('addLoc').value,
+            loc: document.getElementById('addLoc').value || "",
             desc: document.getElementById('addDesc').value,
-            role: addMode,
+            role: addMode, // To wysyła 'tutor' lub 'student'
+            owner: user.name,
             email: user.email,
             time: Date.now()
-        }).then(() => { alert("Dodano!"); nav('home', document.querySelector('.nav-item')); });
+        }).then(() => { 
+            alert("Ogłoszenie dodane pomyślnie!"); 
+            nav('home', document.querySelector('.nav-item')); 
+        });
     }
 
     function renderAds() {
@@ -269,7 +289,7 @@
                 if (selectedChipSub !== 'all' && !a.sub.includes(selectedChipSub)) return;
                 if (search && !a.sub.toLowerCase().includes(search)) return;
                 if (typeFilter !== 'all' && a.type !== typeFilter) return;
-                if (typeFilter === 'live' && cityFilter && !a.loc.toLowerCase().includes(cityFilter)) return;
+                if (typeFilter === 'live' && cityFilter && a.loc && !a.loc.toLowerCase().includes(cityFilter)) return;
 
                 container.innerHTML += `
                     <div class="ad-card">
@@ -280,13 +300,14 @@
                         <h3 style="margin:0; font-size: 20px;">${a.sub}</h3>
                         <p style="color:var(--sec); font-size:14px; margin:10px 0;">${a.desc}</p>
                         <div class="price-tag">${a.price} <span>zł / h</span></div>
-                        <button class="btn-main" onclick="alert('Czat wkrótce!')">Napisz</button>
+                        <button class="btn-main" onclick="alert('Zaloguj się, aby pisać!')">Napisz wiadomość</button>
                     </div>`;
             });
         });
     }
 
     renderAds();
+    if(user) renderProfile();
 </script>
 </body>
 </html>
