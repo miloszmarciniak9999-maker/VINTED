@@ -3,169 +3,315 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Marketing SaaS</title>
+<title>AI Marketing PRO</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
+:root{
+--bg:#020617;
+--card:#0f172a;
+--blue:#2563eb;
+--light:#e2e8f0;
+--border:#1e293b;
+}
+
+*{box-sizing:border-box}
+
 body{
 margin:0;
-font-family:system-ui;
-background:#020617;
+font-family:Inter;
+background:var(--bg);
 color:white;
 }
 
 header{
-padding:15px;
-border-bottom:1px solid #1e293b;
+padding:15px 25px;
 display:flex;
 justify-content:space-between;
+align-items:center;
+border-bottom:1px solid var(--border);
+}
+
+.logo{
+font-weight:700;
+font-size:18px;
+color:#60a5fa;
 }
 
 .container{
+display:grid;
+grid-template-columns:260px 1fr;
+height:calc(100vh - 60px);
+}
+
+.sidebar{
+background:#020617;
+border-right:1px solid var(--border);
+padding:15px;
+}
+
+.sidebar button{
+width:100%;
+margin-bottom:8px;
+}
+
+.content{
 padding:20px;
+overflow:auto;
 }
 
 .card{
-background:#0f172a;
-padding:15px;
-border-radius:12px;
-margin-bottom:15px;
-border:1px solid #1e293b;
+background:var(--card);
+padding:20px;
+border-radius:14px;
+border:1px solid var(--border);
+margin-bottom:20px;
 }
 
-input{
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:20px;
+}
+
+button{
+background:var(--blue);
+border:none;
+padding:10px 14px;
+border-radius:8px;
+color:white;
+cursor:pointer;
+}
+
+input,select{
 width:100%;
 padding:10px;
-margin-top:5px;
 border-radius:8px;
 border:none;
+margin-top:6px;
 background:#020617;
 color:white;
 }
 
-button{
-background:#2563eb;
-border:none;
-padding:10px;
-border-radius:8px;
-color:white;
-margin-top:8px;
-cursor:pointer;
+.chat{
+height:300px;
+overflow:auto;
+margin-bottom:10px;
 }
 
-.hidden{display:none;}
+.msg{
+padding:8px;
+margin:5px 0;
+border-radius:8px;
+}
 
+.user{background:#2563eb}
+.ai{background:#020617}
+
+.stats{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:15px;
+}
+
+.stat{
+background:#020617;
+padding:15px;
+border-radius:10px;
+text-align:center;
+}
+
+@media(max-width:900px){
+.container{
+grid-template-columns:1fr;
+}
+.sidebar{
+display:none;
+}
+.grid{
+grid-template-columns:1fr;
+}
+}
 </style>
 </head>
 
 <body>
 
 <header>
-<h3>🤖 AI Marketing PRO+</h3>
-<div id="user"></div>
+<div class="logo">🤖 AI Marketing PRO</div>
+<button onclick="toggleTheme()">🌙</button>
 </header>
 
 <div class="container">
 
-<!-- LOGIN -->
-<div id="login" class="card">
-<h3>🔐 Logowanie</h3>
-<input id="email" placeholder="email">
-<input id="pass" type="password" placeholder="hasło">
-<button onclick="login()">Zaloguj</button>
-<button onclick="register()">Rejestracja</button>
+<div class="sidebar">
+<button onclick="show('dashboard')">📊 Dashboard</button>
+<button onclick="show('chat')">💬 Chat AI</button>
+<button onclick="show('ideas')">🎬 Pomysły</button>
+<button onclick="show('hooks')">⚡ Hooki</button>
+<button onclick="show('plan')">📅 Plan</button>
+<button onclick="show('competitor')">🧠 Konkurencja</button>
 </div>
 
-<!-- APP -->
-<div id="app" class="hidden">
+<div class="content">
 
+<!-- DASHBOARD -->
+<div id="dashboard" class="view">
+<div class="stats">
+<div class="stat">
+<h3 id="statIdeas">0</h3>
+Pomysły
+</div>
+<div class="stat">
+<h3 id="statHooks">0</h3>
+Hooki
+</div>
+<div class="stat">
+<h3 id="statAnalysis">0</h3>
+Analizy
+</div>
+</div>
+</div>
+
+<!-- CHAT -->
+<div id="chat" class="view" style="display:none">
 <div class="card">
-<h3>🎬 Generator Viral Hooks AI</h3>
-<button onclick="hooks()">Generuj</button>
-<div id="hooks"></div>
+<h3>💬 Chat AI</h3>
+<div class="chat" id="chatBox"></div>
+<input id="chatInput" placeholder="Zapytaj o marketing..." />
+<button onclick="sendChat()">Wyślij</button>
+</div>
 </div>
 
+<!-- IDEAS -->
+<div id="ideas" class="view" style="display:none">
+<div class="card">
+<h3>🎬 Generator rolek</h3>
+<select id="niche">
+<option>Marketing</option>
+<option>Biznes</option>
+<option>Fitness</option>
+<option>AI</option>
+<option>Beauty</option>
+</select>
+<button onclick="generateIdea()">Generuj</button>
+<div id="idea"></div>
+</div>
+</div>
+
+<!-- HOOKS -->
+<div id="hooks" class="view" style="display:none">
+<div class="card">
+<h3>⚡ Viral Hook</h3>
+<button onclick="generateHook()">Generuj</button>
+<div id="hook"></div>
+</div>
+</div>
+
+<!-- PLAN -->
+<div id="plan" class="view" style="display:none">
+<div class="card">
+<h3>📅 Plan contentu</h3>
+<button onclick="generatePlan()">Generuj</button>
+<div id="planResult"></div>
+</div>
+</div>
+
+<!-- COMPETITOR -->
+<div id="competitor" class="view" style="display:none">
 <div class="card">
 <h3>🧠 Analiza konkurencji</h3>
-<input id="competitor" placeholder="@konto">
-<button onclick="analyzeCompetitor()">Analizuj</button>
-<div id="competitorResult"></div>
+<input id="comp" placeholder="@konto">
+<button onclick="analyze()">Analizuj</button>
+<div id="compResult"></div>
 </div>
-
-<div class="card">
-<h3>📊 Dashboard Analytics</h3>
-<div id="stats"></div>
 </div>
 
 </div>
-
 </div>
 
 <script>
 
-// auth
-function register(){
-let email=document.getElementById("email").value;
-let pass=document.getElementById("pass").value;
+let stats={ideas:0,hooks:0,analysis:0}
 
-localStorage.setItem("user",JSON.stringify({email,pass}));
-alert("konto utworzone");
+function updateStats(){
+document.getElementById("statIdeas").innerText=stats.ideas
+document.getElementById("statHooks").innerText=stats.hooks
+document.getElementById("statAnalysis").innerText=stats.analysis
 }
 
-function login(){
-let email=document.getElementById("email").value;
-let pass=document.getElementById("pass").value;
-
-let user=JSON.parse(localStorage.getItem("user"));
-
-if(user && user.email===email && user.pass===pass){
-document.getElementById("login").classList.add("hidden");
-document.getElementById("app").classList.remove("hidden");
-document.getElementById("user").innerText=email;
-loadStats();
-}
+function show(id){
+document.querySelectorAll(".view").forEach(v=>v.style.display="none")
+document.getElementById(id).style.display="block"
 }
 
-// viral hooks
-function hooks(){
-let arr=[
-"To konto rośnie szybciej niż 99%",
-"Nikt Ci tego nie powie",
+function sendChat(){
+let input=document.getElementById("chatInput")
+let text=input.value
+
+let div=document.createElement("div")
+div.className="msg user"
+div.innerText=text
+chatBox.appendChild(div)
+
+let reply="Spróbuj stworzyć rolkę z mocnym hookiem i CTA"
+
+let ai=document.createElement("div")
+ai.className="msg ai"
+ai.innerText=reply
+
+setTimeout(()=>chatBox.appendChild(ai),300)
+
+input.value=""
+}
+
+function generateIdea(){
+let niche=document.getElementById("niche").value
+document.getElementById("idea").innerText=
+"🎬 3 błędy w "+niche+"\n📝 Sprawdź czy robisz to źle\n#"+niche
+stats.ideas++
+updateStats()
+}
+
+function generateHook(){
+let hooks=[
+"STOP! Robisz to źle",
 "Ten trik daje viral",
+"Nikt Ci tego nie powie",
 "3 sekundy które zmienią wszystko"
-];
-let h=arr[Math.floor(Math.random()*arr.length)];
-document.getElementById("hooks").innerText=h;
-saveStat("hooks");
+]
+let h=hooks[Math.floor(Math.random()*hooks.length)]
+document.getElementById("hook").innerText=h
+stats.hooks++
+updateStats()
 }
 
-// competitor
-function analyzeCompetitor(){
-let name=document.getElementById("competitor").value;
-
-let result="📊 Analiza "+name+"\n";
-result+="- publikuje 5x tygodniowo\n";
-result+="- viral hooks\n";
-result+="- mocne CTA\n";
-
-document.getElementById("competitorResult").innerText=result;
-
-saveStat("analysis");
+function generatePlan(){
+document.getElementById("planResult").innerText=
+"Pon: edukacja\nWt: hook\nŚr: case\nCzw: trend\nPt: sprzedaż"
 }
 
-// analytics
-function saveStat(type){
-let stats=JSON.parse(localStorage.getItem("stats"))||{hooks:0,analysis:0};
-stats[type]++;
-localStorage.setItem("stats",JSON.stringify(stats));
-loadStats();
+function analyze(){
+let name=document.getElementById("comp").value
+document.getElementById("compResult").innerText=
+"📊 "+name+"\n- mocne hooki\n- codzienne rolki\n- CTA"
+stats.analysis++
+updateStats()
 }
 
-function loadStats(){
-let stats=JSON.parse(localStorage.getItem("stats"))||{hooks:0,analysis:0};
-document.getElementById("stats").innerText=
-"Hooki wygenerowane: "+stats.hooks+
-"\nAnalizy konkurencji: "+stats.analysis;
+function toggleTheme(){
+document.body.classList.toggle("light")
+if(document.body.classList.contains("light")){
+document.body.style.background="white"
+document.body.style.color="black"
+}else{
+document.body.style.background="#020617"
+document.body.style.color="white"
 }
+}
+
+updateStats()
 
 </script>
 
