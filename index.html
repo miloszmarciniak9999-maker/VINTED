@@ -3,255 +3,168 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Doradca Marketingowy</title>
+<title>AI Marketing SaaS</title>
 
 <style>
-:root{
---bg:#020617;
---card:#0f172a;
---blue:#2563eb;
---light:#e2e8f0;
-}
-
 body{
 margin:0;
-font-family:Arial,Helvetica,sans-serif;
-background:var(--bg);
+font-family:system-ui;
+background:#020617;
 color:white;
 }
 
 header{
 padding:15px;
-background:#020617;
 border-bottom:1px solid #1e293b;
 display:flex;
 justify-content:space-between;
-align-items:center;
 }
 
 .container{
-max-width:1200px;
-margin:auto;
 padding:20px;
 }
 
-.grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:20px;
-}
-
 .card{
-background:var(--card);
+background:#0f172a;
 padding:15px;
 border-radius:12px;
+margin-bottom:15px;
 border:1px solid #1e293b;
 }
 
-.chat{
-height:350px;
-overflow:auto;
-margin-bottom:10px;
-}
-
-.msg{
-padding:10px;
-margin:5px 0;
-border-radius:8px;
-}
-
-.user{background:#2563eb;}
-.ai{background:#1e293b;}
-
-input,select,textarea{
+input{
 width:100%;
 padding:10px;
 margin-top:5px;
 border-radius:8px;
 border:none;
+background:#020617;
+color:white;
 }
 
 button{
-background:var(--blue);
+background:#2563eb;
 border:none;
-padding:10px 15px;
+padding:10px;
 border-radius:8px;
 color:white;
-cursor:pointer;
 margin-top:8px;
+cursor:pointer;
 }
 
-.saved{
-max-height:200px;
-overflow:auto;
-}
+.hidden{display:none;}
+
 </style>
 </head>
 
 <body>
 
 <header>
-<h2>🤖 AI Doradca Marketingowy</h2>
-<button onclick="toggleTheme()">🌙 / ☀️</button>
+<h3>🤖 AI Marketing PRO+</h3>
+<div id="user"></div>
 </header>
 
 <div class="container">
-<div class="grid">
 
-<!-- CHAT -->
-<div class="card">
-<h3>💬 Chat AI</h3>
-<div class="chat" id="chat"></div>
-<input id="chatInput" placeholder="Napisz o swojej branży..." />
-<button onclick="sendChat()">Wyślij</button>
+<!-- LOGIN -->
+<div id="login" class="card">
+<h3>🔐 Logowanie</h3>
+<input id="email" placeholder="email">
+<input id="pass" type="password" placeholder="hasło">
+<button onclick="login()">Zaloguj</button>
+<button onclick="register()">Rejestracja</button>
 </div>
 
-<!-- NISZA -->
-<div class="card">
-<h3>🎯 Wybór niszy</h3>
-<select id="niche">
-<option>Marketing</option>
-<option>Fitness</option>
-<option>Biznes</option>
-<option>Ecommerce</option>
-<option>AI</option>
-<option>Beauty</option>
-</select>
-<button onclick="generateIdeas()">Generuj pomysł</button>
-<div id="ideas"></div>
-</div>
+<!-- APP -->
+<div id="app" class="hidden">
 
-<!-- HOOK -->
 <div class="card">
-<h3>⚡ Generator Hooków</h3>
-<button onclick="generateHooks()">Generuj Hook</button>
+<h3>🎬 Generator Viral Hooks AI</h3>
+<button onclick="hooks()">Generuj</button>
 <div id="hooks"></div>
 </div>
 
-<!-- ANALIZA -->
 <div class="card">
-<h3>📊 Analiza konta IG</h3>
-<input id="followers" placeholder="Ilość obserwujących" />
-<input id="posts" placeholder="Ilość postów" />
-<button onclick="analyze()">Analizuj</button>
-<div id="analysis"></div>
+<h3>🧠 Analiza konkurencji</h3>
+<input id="competitor" placeholder="@konto">
+<button onclick="analyzeCompetitor()">Analizuj</button>
+<div id="competitorResult"></div>
 </div>
 
-<!-- PLANNER -->
 <div class="card">
-<h3>📅 Planner contentu</h3>
-<button onclick="planner()">Generuj plan</button>
-<div id="plan"></div>
-</div>
-
-<!-- ZAPIS -->
-<div class="card">
-<h3>💾 Zapisane pomysły</h3>
-<div class="saved" id="saved"></div>
+<h3>📊 Dashboard Analytics</h3>
+<div id="stats"></div>
 </div>
 
 </div>
+
 </div>
 
 <script>
 
-let memory = JSON.parse(localStorage.getItem("chatMemory")) || [];
+// auth
+function register(){
+let email=document.getElementById("email").value;
+let pass=document.getElementById("pass").value;
 
-function saveMemory(){
-localStorage.setItem("chatMemory",JSON.stringify(memory));
+localStorage.setItem("user",JSON.stringify({email,pass}));
+alert("konto utworzone");
 }
 
-function addMsg(text,type){
-let chat=document.getElementById("chat");
-let div=document.createElement("div");
-div.className="msg "+type;
-div.innerText=text;
-chat.appendChild(div);
-chat.scrollTop=chat.scrollHeight;
+function login(){
+let email=document.getElementById("email").value;
+let pass=document.getElementById("pass").value;
+
+let user=JSON.parse(localStorage.getItem("user"));
+
+if(user && user.email===email && user.pass===pass){
+document.getElementById("login").classList.add("hidden");
+document.getElementById("app").classList.remove("hidden");
+document.getElementById("user").innerText=email;
+loadStats();
+}
 }
 
-function sendChat(){
-let input=document.getElementById("chatInput");
-let text=input.value;
-if(!text) return;
-
-addMsg(text,"user");
-memory.push({user:text});
-
-let response="🎬 Pomysł: 3 błędy w Twojej branży\n";
-response+="📝 Opis: Sprawdź czy tego nie robisz\n";
-response+="#️⃣ #marketing #rolki #instagram\n";
-
-setTimeout(()=>{
-addMsg(response,"ai");
-memory.push({ai:response});
-saveMemory();
-},400);
-
-input.value="";
-}
-
-function generateIdeas(){
-let niche=document.getElementById("niche").value;
-let idea="🎬 Pomysł dla "+niche+" :\n";
-idea+="3 rzeczy które robisz źle";
-document.getElementById("ideas").innerText=idea;
-saveIdea(idea);
-}
-
-function generateHooks(){
-let hooks=[
-"STOP! Robisz to źle",
+// viral hooks
+function hooks(){
+let arr=[
+"To konto rośnie szybciej niż 99%",
 "Nikt Ci tego nie powie",
-"3 sekundy które zmienią zasięgi",
-"To niszczy Twoje rolki"
+"Ten trik daje viral",
+"3 sekundy które zmienią wszystko"
 ];
-let h=hooks[Math.floor(Math.random()*hooks.length)];
+let h=arr[Math.floor(Math.random()*arr.length)];
 document.getElementById("hooks").innerText=h;
-saveIdea(h);
+saveStat("hooks");
 }
 
-function analyze(){
-let f=document.getElementById("followers").value;
-let result="📊 Analiza:\n";
-if(f<1000) result+="Buduj więcej contentu\n";
-else result+="Masz potencjał do skalowania\n";
-document.getElementById("analysis").innerText=result;
+// competitor
+function analyzeCompetitor(){
+let name=document.getElementById("competitor").value;
+
+let result="📊 Analiza "+name+"\n";
+result+="- publikuje 5x tygodniowo\n";
+result+="- viral hooks\n";
+result+="- mocne CTA\n";
+
+document.getElementById("competitorResult").innerText=result;
+
+saveStat("analysis");
 }
 
-function planner(){
-let days=["Pon: Rolka edukacyjna","Wt: Hook","Śr: Case study","Czw: Trend","Pt: Sprzedaż"];
-document.getElementById("plan").innerText=days.join("\n");
+// analytics
+function saveStat(type){
+let stats=JSON.parse(localStorage.getItem("stats"))||{hooks:0,analysis:0};
+stats[type]++;
+localStorage.setItem("stats",JSON.stringify(stats));
+loadStats();
 }
 
-function saveIdea(text){
-let saved=JSON.parse(localStorage.getItem("savedIdeas"))||[];
-saved.push(text);
-localStorage.setItem("savedIdeas",JSON.stringify(saved));
-loadSaved();
-}
-
-function loadSaved(){
-let saved=JSON.parse(localStorage.getItem("savedIdeas"))||[];
-document.getElementById("saved").innerText=saved.join("\n\n");
-}
-
-loadSaved();
-
-function toggleTheme(){
-document.body.classList.toggle("light");
-if(document.body.classList.contains("light")){
-document.body.style.background="white";
-document.body.style.color="black";
-}else{
-document.body.style.background="#020617";
-document.body.style.color="white";
-}
-}
-
-// PWA
-if('serviceWorker' in navigator){
-navigator.serviceWorker.register('sw.js');
+function loadStats(){
+let stats=JSON.parse(localStorage.getItem("stats"))||{hooks:0,analysis:0};
+document.getElementById("stats").innerText=
+"Hooki wygenerowane: "+stats.hooks+
+"\nAnalizy konkurencji: "+stats.analysis;
 }
 
 </script>
