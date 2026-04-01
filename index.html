@@ -6,159 +6,252 @@
 <title>AI Doradca Marketingowy</title>
 
 <style>
-body {
-font-family: Arial, sans-serif;
-background: #0f172a;
-color: white;
-margin: 0;
-padding: 0;
+:root{
+--bg:#020617;
+--card:#0f172a;
+--blue:#2563eb;
+--light:#e2e8f0;
 }
 
-.container {
-max-width: 900px;
-margin: auto;
-padding: 20px;
+body{
+margin:0;
+font-family:Arial,Helvetica,sans-serif;
+background:var(--bg);
+color:white;
 }
 
-h1 {
-text-align: center;
-color: #38bdf8;
+header{
+padding:15px;
+background:#020617;
+border-bottom:1px solid #1e293b;
+display:flex;
+justify-content:space-between;
+align-items:center;
 }
 
-.chat-box {
-background: #020617;
-border-radius: 10px;
-padding: 15px;
-height: 500px;
-overflow-y: auto;
-border: 1px solid #1e293b;
+.container{
+max-width:1200px;
+margin:auto;
+padding:20px;
 }
 
-.message {
-margin: 10px 0;
-padding: 12px;
-border-radius: 8px;
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:20px;
 }
 
-.user {
-background: #2563eb;
-text-align: right;
+.card{
+background:var(--card);
+padding:15px;
+border-radius:12px;
+border:1px solid #1e293b;
 }
 
-.ai {
-background: #1e293b;
+.chat{
+height:350px;
+overflow:auto;
+margin-bottom:10px;
 }
 
-.input-area {
-display: flex;
-margin-top: 10px;
+.msg{
+padding:10px;
+margin:5px 0;
+border-radius:8px;
 }
 
-input {
-flex: 1;
-padding: 12px;
-border-radius: 8px;
-border: none;
-font-size: 16px;
+.user{background:#2563eb;}
+.ai{background:#1e293b;}
+
+input,select,textarea{
+width:100%;
+padding:10px;
+margin-top:5px;
+border-radius:8px;
+border:none;
 }
 
-button {
-margin-left: 10px;
-padding: 12px 20px;
-border: none;
-border-radius: 8px;
-background: #38bdf8;
-color: black;
-font-weight: bold;
-cursor: pointer;
+button{
+background:var(--blue);
+border:none;
+padding:10px 15px;
+border-radius:8px;
+color:white;
+cursor:pointer;
+margin-top:8px;
 }
 
-button:hover {
-background: #0ea5e9;
+.saved{
+max-height:200px;
+overflow:auto;
 }
 </style>
 </head>
 
 <body>
 
+<header>
+<h2>🤖 AI Doradca Marketingowy</h2>
+<button onclick="toggleTheme()">🌙 / ☀️</button>
+</header>
+
 <div class="container">
-<h1>🤖 AI Doradca Marketingowy</h1>
+<div class="grid">
 
-<div class="chat-box" id="chat"></div>
+<!-- CHAT -->
+<div class="card">
+<h3>💬 Chat AI</h3>
+<div class="chat" id="chat"></div>
+<input id="chatInput" placeholder="Napisz o swojej branży..." />
+<button onclick="sendChat()">Wyślij</button>
+</div>
 
-<div class="input-area">
-<input type="text" id="input" placeholder="Np. prowadzę konto o fitness..." />
-<button onclick="sendMessage()">Wyślij</button>
+<!-- NISZA -->
+<div class="card">
+<h3>🎯 Wybór niszy</h3>
+<select id="niche">
+<option>Marketing</option>
+<option>Fitness</option>
+<option>Biznes</option>
+<option>Ecommerce</option>
+<option>AI</option>
+<option>Beauty</option>
+</select>
+<button onclick="generateIdeas()">Generuj pomysł</button>
+<div id="ideas"></div>
+</div>
+
+<!-- HOOK -->
+<div class="card">
+<h3>⚡ Generator Hooków</h3>
+<button onclick="generateHooks()">Generuj Hook</button>
+<div id="hooks"></div>
+</div>
+
+<!-- ANALIZA -->
+<div class="card">
+<h3>📊 Analiza konta IG</h3>
+<input id="followers" placeholder="Ilość obserwujących" />
+<input id="posts" placeholder="Ilość postów" />
+<button onclick="analyze()">Analizuj</button>
+<div id="analysis"></div>
+</div>
+
+<!-- PLANNER -->
+<div class="card">
+<h3>📅 Planner contentu</h3>
+<button onclick="planner()">Generuj plan</button>
+<div id="plan"></div>
+</div>
+
+<!-- ZAPIS -->
+<div class="card">
+<h3>💾 Zapisane pomysły</h3>
+<div class="saved" id="saved"></div>
+</div>
+
 </div>
 </div>
 
 <script>
 
-function addMessage(text, sender) {
-const chat = document.getElementById("chat");
-const div = document.createElement("div");
-div.classList.add("message");
-div.classList.add(sender);
-div.innerText = text;
+let memory = JSON.parse(localStorage.getItem("chatMemory")) || [];
+
+function saveMemory(){
+localStorage.setItem("chatMemory",JSON.stringify(memory));
+}
+
+function addMsg(text,type){
+let chat=document.getElementById("chat");
+let div=document.createElement("div");
+div.className="msg "+type;
+div.innerText=text;
 chat.appendChild(div);
-chat.scrollTop = chat.scrollHeight;
+chat.scrollTop=chat.scrollHeight;
 }
 
-function generateAIResponse(input) {
-input = input.toLowerCase();
+function sendChat(){
+let input=document.getElementById("chatInput");
+let text=input.value;
+if(!text) return;
 
-let response = "📊 Analiza marketingowa:\n\n";
+addMsg(text,"user");
+memory.push({user:text});
 
-if(input.includes("fitness")) {
-response += "🎬 Pomysł na rolkę:\n";
-response += "3 błędy które niszczą twoje efekty na siłowni\n\n";
-response += "📝 Opis:\n";
-response += "Robisz to i nie widzisz efektów? Sprawdź czy nie popełniasz tych błędów!\n\n";
-response += "#️⃣ Hashtagi:\n";
-response += "#fitness #silownia #trening #motywacja #fitpolska #gym #workout";
+let response="🎬 Pomysł: 3 błędy w Twojej branży\n";
+response+="📝 Opis: Sprawdź czy tego nie robisz\n";
+response+="#️⃣ #marketing #rolki #instagram\n";
+
+setTimeout(()=>{
+addMsg(response,"ai");
+memory.push({ai:response});
+saveMemory();
+},400);
+
+input.value="";
 }
 
-else if(input.includes("biznes")) {
-response += "🎬 Pomysł na rolkę:\n";
-response += "Dlaczego 90% biznesów nie rośnie na Instagramie\n\n";
-response += "📝 Opis:\n";
-response += "Jeśli robisz te 3 rzeczy — blokujesz swój rozwój.\n\n";
-response += "#️⃣ Hashtagi:\n";
-response += "#biznes #marketing #instagramtips #socialmedia #rozwojbiznesu";
+function generateIdeas(){
+let niche=document.getElementById("niche").value;
+let idea="🎬 Pomysł dla "+niche+" :\n";
+idea+="3 rzeczy które robisz źle";
+document.getElementById("ideas").innerText=idea;
+saveIdea(idea);
 }
 
-else {
-response += "🎬 Pomysł na rolkę:\n";
-response += "3 błędy które robisz w social media\n\n";
-response += "📝 Opis:\n";
-response += "Sprawdź czy nie blokujesz swoich zasięgów.\n\n";
-response += "#️⃣ Hashtagi:\n";
-response += "#marketing #rolki #instagram #socialmedia #zasięgi";
+function generateHooks(){
+let hooks=[
+"STOP! Robisz to źle",
+"Nikt Ci tego nie powie",
+"3 sekundy które zmienią zasięgi",
+"To niszczy Twoje rolki"
+];
+let h=hooks[Math.floor(Math.random()*hooks.length)];
+document.getElementById("hooks").innerText=h;
+saveIdea(h);
 }
 
-response += "\n\n📈 Co poprawić:";
-response += "\n- mocniejszy hook w 3 sekundy";
-response += "\n- dodaj napisy";
-response += "\n- krótsze ujęcia";
-response += "\n- CTA na końcu";
-
-return response;
+function analyze(){
+let f=document.getElementById("followers").value;
+let result="📊 Analiza:\n";
+if(f<1000) result+="Buduj więcej contentu\n";
+else result+="Masz potencjał do skalowania\n";
+document.getElementById("analysis").innerText=result;
 }
 
-function sendMessage() {
-const input = document.getElementById("input");
-const text = input.value;
+function planner(){
+let days=["Pon: Rolka edukacyjna","Wt: Hook","Śr: Case study","Czw: Trend","Pt: Sprzedaż"];
+document.getElementById("plan").innerText=days.join("\n");
+}
 
-if(text.trim() === "") return;
+function saveIdea(text){
+let saved=JSON.parse(localStorage.getItem("savedIdeas"))||[];
+saved.push(text);
+localStorage.setItem("savedIdeas",JSON.stringify(saved));
+loadSaved();
+}
 
-addMessage(text, "user");
+function loadSaved(){
+let saved=JSON.parse(localStorage.getItem("savedIdeas"))||[];
+document.getElementById("saved").innerText=saved.join("\n\n");
+}
 
-setTimeout(() => {
-const aiResponse = generateAIResponse(text);
-addMessage(aiResponse, "ai");
-}, 500);
+loadSaved();
 
-input.value = "";
+function toggleTheme(){
+document.body.classList.toggle("light");
+if(document.body.classList.contains("light")){
+document.body.style.background="white";
+document.body.style.color="black";
+}else{
+document.body.style.background="#020617";
+document.body.style.color="white";
+}
+}
+
+// PWA
+if('serviceWorker' in navigator){
+navigator.serviceWorker.register('sw.js');
 }
 
 </script>
